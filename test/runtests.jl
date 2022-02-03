@@ -2,7 +2,7 @@ using Test
 
 include("../src/CustomTypes.jl")
 include("../src/Spheroidal.jl")
-include("../src/QNMFunctionsTeukEqn.jl")
+include("../src/TeukolskyQNMFunctions.jl")
 
 include("Norms.jl")
 include("TestCHLaplacian.jl")
@@ -11,7 +11,7 @@ include("TestRadialODE.jl")
 include("TestSphere.jl")
 include("TestSpheroidal.jl")
 
-using .Norms, .CustomTypes, ..QNMFunctionsTeukEqn
+using .Norms, .CustomTypes, ..TeukolskyQNMFunctions
 
 import .TestCHLaplacian, .TestChebyshev, .TestRadialODE, .TestSphere, .TestSpheroidal
 

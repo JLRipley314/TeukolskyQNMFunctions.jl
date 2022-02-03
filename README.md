@@ -5,7 +5,7 @@
 [![Build Status](https://github.com/JLRipley314/TeukolskyQNMFunctions.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/JLRipley314/TeukolskyQNMFunctions.jl/actions/workflows/CI.yml?query=branch%3Amain)
 [![Coverage](https://codecov.io/gh/JLRipley314/TeukolskyQNMFunctions.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/JLRipley314/TeukolskyQNMFunctions.jl)
 
-`QNMFunctionsTeukEqn` computes the quasinormal modes and eigenfunctions 
+`TeukolskyQNMFunctions` computes the quasinormal modes and eigenfunctions 
 for the spin s Teukolsky equation
 using a horizon penetrating, hyperboloidally compactified coordinate system.
 The main advantage of using these coordinates is that the quasinormal
@@ -23,20 +23,20 @@ This [note]() explains the main ideas that went into this code,
 and derives the relevant equations of motion.
 See also the docstrings to the functions in the source code.
 
-# To Do
-
-* Add spectral (~Leaver) solver for radial equation, which will like be
-  more stable than the Chebyshev pseudospectral solver. 
-
 # Warning!
 
 This code does *not* compute quasinormal modes nearly as quickly 
 (nor at a given numerical precision as accurately) as other established
 quasinormal mode codes, e.g. 
-Leo Stein's [qnm code](https://github.com/duetosymmetry/qnm)
+Leo Stein's [qnm code](https://github.com/duetosymmetry/qnm).
 If you just want to compute a quasinormal mode, I suggest using that code,
 or looking at the publically available qnm tables, e.g. 
 Emanuele Berti's [tables of qnm](https://pages.jh.edu/eberti2/ringdown/).
+
+# To Do
+
+* Add spectral (~Leaver) solver for radial equation, which will likely be
+  more stable than the Chebyshev pseudospectral solver. 
 
 # How to cite
 
@@ -45,4 +45,3 @@ the [note]()
 which describes the ideas that went into this code, please cite
 ```
 ```
-
