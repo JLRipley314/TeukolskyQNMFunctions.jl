@@ -4,12 +4,6 @@ for the spin s Teukolsky equation
 using a horizon penetrating, hyperboloidally compactified coordinate system.
 The main advantage of using these coordinates is that the quasinormal
 wavefunctions are finite valued from the black hole to future null infinity.
-
-Currently, this code uses a Chebyshev pseudospectral method to compute
-the radial part of the eigenfunctions, 
-and a spectral method to compute the angular part of the eigenfunctions
-The angular spectral method was originally introduced by 
-Cook and Zalutskiy (arXiv:1410.7698).
 """
 module TeukolskyQNMFunctions 
 
