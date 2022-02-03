@@ -1,6 +1,48 @@
-# TeukolskyQNMFunctions
+# TeukolskyQNMFunctions.jl
 
 [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://JLRipley314.github.io/TeukolskyQNMFunctions.jl/stable)
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://JLRipley314.github.io/TeukolskyQNMFunctions.jl/dev)
 [![Build Status](https://github.com/JLRipley314/TeukolskyQNMFunctions.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/JLRipley314/TeukolskyQNMFunctions.jl/actions/workflows/CI.yml?query=branch%3Amain)
 [![Coverage](https://codecov.io/gh/JLRipley314/TeukolskyQNMFunctions.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/JLRipley314/TeukolskyQNMFunctions.jl)
+
+`QNMFunctionsTeukEqn` computes the quasinormal modes and eigenfunctions 
+for the spin s Teukolsky equation
+using a horizon penetrating, hyperboloidally compactified coordinate system.
+The main advantage of using these coordinates is that the quasinormal
+wavefunctions are finite valued from the black hole to future null infinity.
+
+Currently, this code uses a Chebyshev pseudospectral method to compute
+the radial part of the eigenfunctions, 
+and a spectral method to compute the angular part of the eigenfunctions
+The angular spectral method was originally introduced by 
+[Cook and Zalutskiy](https://arxiv.org/abs/1410.7698)).
+
+# Documentation
+
+This [note]() explains the main ideas that went into this code,
+and derives the relevant equations of motion.
+See also the docstrings to the functions in the source code.
+
+# To Do
+
+* Add spectral (~Leaver) solver for radial equation, which will like be
+  more stable than the Chebyshev pseudospectral solver. 
+
+# Warning!
+
+This code does *not* compute quasinormal modes nearly as quickly 
+(nor at a given numerical precision as accurately) as other established
+quasinormal mode codes, e.g. 
+Leo Stein's [qnm code](https://github.com/duetosymmetry/qnm)
+If you just want to compute a quasinormal mode, I suggest using that code,
+or looking at the publically available qnm tables, e.g. 
+Emanuele Berti's [tables of qnm](https://pages.jh.edu/eberti2/ringdown/).
+
+# How to cite
+
+If you end up using this code in a publication, or some of the ideas in
+the [note]() 
+which describes the ideas that went into this code, please cite
+```
+```
+
