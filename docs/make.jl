@@ -6,7 +6,7 @@ DocMeta.setdocmeta!(TeukolskyQNMFunctions, :DocTestSetup, :(using TeukolskyQNMFu
 makedocs(;
     modules=[TeukolskyQNMFunctions],
     authors="Justin L. Ripley",
-    repo="https://github.com/JLRipley314/TeukolskyQNMFunctions.jl/blob/{commit}{path}#{line}",
+    repo="https://github.com/JLRipley314/TeukolskyQNMFunctions.jl.git",
     sitename="TeukolskyQNMFunctions.jl",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
