@@ -19,7 +19,8 @@ The angular spectral method was originally introduced by
 
 # Documentation
 
-This [note]() explains the main ideas that went into this code,
+This the [arXiv:2202.03837](https://arxiv.org/abs/2202.03837) 
+explains the main ideas that went into this code,
 and derives the relevant equations of motion.
 See also the docstrings to the functions in the source code.
 
@@ -41,7 +42,16 @@ Emanuele Berti's [tables of qnm](https://pages.jh.edu/eberti2/ringdown/).
 # How to cite
 
 If you end up using this code in a publication, or some of the ideas in
-the [note]() 
+[arXiv:2202.03837](https://arxiv.org/abs/2202.03837), 
 which describes the ideas that went into this code, please cite
 ```
+@article{Ripley:2022ypi,
+    author = "Ripley, Justin L.",
+    title = "{Computing the quasinormal modes and eigenfunctions for the Teukolsky equation using horizon penetrating, hyperboloidally compactified coordinates}",
+    eprint = "2202.03837",
+    archivePrefix = "arXiv",
+    primaryClass = "gr-qc",
+    month = "2",
+    year = "2022"
+}
 ```
