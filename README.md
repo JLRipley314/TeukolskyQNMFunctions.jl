@@ -19,7 +19,7 @@ The angular spectral method was originally introduced by
 
 # Documentation
 
-This the [arXiv:2202.03837](https://arxiv.org/abs/2202.03837) 
+The note [arXiv:2202.03837](https://arxiv.org/abs/2202.03837) 
 explains the main ideas that went into this code,
 and derives the relevant equations of motion.
 See also the docstrings to the functions in the source code.
@@ -31,7 +31,7 @@ This code does *not* compute quasinormal modes nearly as quickly
 quasinormal mode codes, e.g. 
 Leo Stein's [qnm code](https://github.com/duetosymmetry/qnm).
 If you just want to compute a quasinormal mode, I suggest using that code,
-or looking at the publically available qnm tables, e.g. 
+or looking at the publicly available qnm tables, e.g. 
 Emanuele Berti's [tables of qnm](https://pages.jh.edu/eberti2/ringdown/).
 
 # To Do
