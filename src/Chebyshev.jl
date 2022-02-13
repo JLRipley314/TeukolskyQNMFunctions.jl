@@ -3,6 +3,8 @@ Methods for position space Chebyshev methods.
 """
 module Chebyshev 
 
+export chep_pts, mat_X, mat_D1, to_cheb, to_real
+
 include("CustomTypes.jl")
 
 using .CustomTypes
@@ -16,6 +18,7 @@ Computes Generates nx Chebyshev points in [-1,1]
 function cheb_pts(nx::myI)::Vector{myF}
    return [cos(pi*i/(nx-tomyF(1))) for i=0:(nx-1)]
 end
+
 """
     cheb_pts(xmin::myF, xmax::myF, nx::myI)::Vector{myF}
 
@@ -27,6 +30,7 @@ function cheb_pts(xmin::myF, xmax::myF, nx::myI)::Vector{myF}
    b = (xmax + xmin)/tomyF(2) 
    return [m*pts[i] + b for i=1:nx] 
 end
+
 """
     mat_X(
       xmin::myF,
