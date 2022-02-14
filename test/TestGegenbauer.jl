@@ -78,8 +78,8 @@ function airy_sol_ode(
       xmax::myF,
       om2
    ) 
-   D2  = GE.compute_D(nx,tomyI(2))
-   X1  = GE.compute_M(nx,tomyI(2))
+   D2  = GE.compute_D(nx,tomyI(2),xmin,xmax)
+   X1  = GE.compute_M(nx,tomyI(2),xmin,xmax)
    S0  = GE.compute_S(nx,tomyI(0))
    S1  = GE.compute_S(nx,tomyI(1))
    
@@ -94,11 +94,7 @@ function airy_sol_ode(
    pts = CH.cheb_pts(xmin,xmax,nx)
    analytic_sol = CH.to_cheb(airyai.(pts))
 
-   println(Op)
-   println(numerical_sol)
-   println(analytic_sol)
-
-   #@test norm(numerical_sol .- analytic_sol,1) < tolerance
+   @test norm(numerical_sol .- analytic_sol,1) < tolerance
    return nothing 
 end
 

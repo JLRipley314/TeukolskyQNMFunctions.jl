@@ -25,14 +25,12 @@ import .Spheroidal: compute_l_min, eig_vals_vecs
 ###--------------------------------------------------------------
 ## Test Gegenbauer polynomial 
 ##--------------------------------------------------------------
-nx=tomyI(10)
+nx=tomyI(20)
 c0=tomyF(1.3243)
 c1=tomyF(2.3)
 om2=tomyF(1.0)
-#xmin=tomyF(-12.2321)
-#xmax=tomyF(+1.932)
-xmin=tomyF(-1)
-xmax=tomyF(+1)
+xmin=tomyF(-2.2321)
+xmax=tomyF(+1.932)
 TestGegenbauer.constant_sol_ode(nx,xmin,xmax,c0)
 TestGegenbauer.linear_sol_ode(nx,xmin,xmax,c0,c1)
 TestGegenbauer.airy_sol_ode(nx,xmin,xmax,om2)
