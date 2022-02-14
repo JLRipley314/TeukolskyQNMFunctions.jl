@@ -4,23 +4,43 @@ include("../src/CustomTypes.jl")
 include("../src/Spheroidal.jl")
 include("../src/TeukolskyQNMFunctions.jl")
 
-include("Norms.jl")
 include("TestCHLaplacian.jl")
 include("TestChebyshev.jl")
+include("TestGegenbauer.jl")
 include("TestRadialODE.jl")
 include("TestSphere.jl")
 include("TestSpheroidal.jl")
 
-using .Norms, .CustomTypes, ..TeukolskyQNMFunctions
+using .CustomTypes, ..TeukolskyQNMFunctions
 
-import .TestCHLaplacian, .TestChebyshev, .TestRadialODE, .TestSphere, .TestSpheroidal
+import .TestCHLaplacian 
+import .TestChebyshev 
+import .TestGegenbauer 
+import .TestRadialODE
+import .TestSphere
+import .TestSpheroidal
 
 import .Spheroidal: compute_l_min, eig_vals_vecs
-            
+
+###--------------------------------------------------------------
+## Test Gegenbauer polynomial 
+##--------------------------------------------------------------
+nx=tomyI(10)
+c0=tomyF(1.3243)
+c1=tomyF(2.3)
+om2=tomyF(1.0)
+#xmin=tomyF(-12.2321)
+#xmax=tomyF(+1.932)
+xmin=tomyF(-1)
+xmax=tomyF(+1)
+TestGegenbauer.constant_sol_ode(nx,xmin,xmax,c0)
+TestGegenbauer.linear_sol_ode(nx,xmin,xmax,c0,c1)
+TestGegenbauer.airy_sol_ode(nx,xmin,xmax,om2)
+#=
 avals = [0.0, 0.354, 0.7, 0.99] ## same as in generate.py
-##============================================================
+###--------------------------------------------------------------
 ## Test convergence of Chebyshev derivatives 
-##============================================================
+##--------------------------------------------------------------
 nx   = tomyI(16)
 xmin = tomyF(-1.431)
 xmax = tomyF(10.3)
@@ -39,18 +59,18 @@ TestChebyshev.test_X_matrices(nx, xmin, xmax)
 
 TestChebyshev.test_to_cheb(nx) 
 TestChebyshev.test_to_cheb_to_real(nx, xmin, xmax) 
-##============================================================
+##--------------------------------------------------------------
 ## Test Chebyshev second derivative 
-##============================================================
+##--------------------------------------------------------------
 nx   = tomyI(512) 
 neig = tomyI(4)
 xmin = tomyF(0.0)
 xmax = tomyF(1.0)
 
 TestCHLaplacian.interval_laplacian(nx,neig,xmin,xmax)
-##============================================================
+##--------------------------------------------------------------
 ## Testing spherical function 
-##============================================================
+##--------------------------------------------------------------
 TestSphere.test_swal_inner_product(48,-2,-2)
 TestSphere.test_swal_inner_product(48,-1,-2)
 TestSphere.test_swal_inner_product(48, 0,-2)
@@ -87,9 +107,9 @@ TestSphere.test_norm_swal_lap(48,-1,5,23)
 TestSphere.test_norm_swal_lap(48, 0,5,23)
 TestSphere.test_norm_swal_lap(48, 1,5,23)
 TestSphere.test_norm_swal_lap(48, 2,5,23)
-##============================================================
+##--------------------------------------------------------------
 ## Testing spheroidal functions 
-##============================================================
+##--------------------------------------------------------------
 nl   =  30
 neig =  10
 
@@ -117,9 +137,9 @@ for s in [-2,-1,0]
       end
    end
 end
-##============================================================
+##--------------------------------------------------------------
 ## Testing Spheroidal ODE QNM 
-##============================================================
+##--------------------------------------------------------------
 for n=[0,1]
    for s=0:2
       for m=[0,2]
@@ -138,9 +158,9 @@ for n=[0,1]
       end
    end
 end
-##============================================================
+##--------------------------------------------------------------
 ## Testing Radial ODE QNM 
-##============================================================
+##--------------------------------------------------------------
 nr = 80 
 
 for n=[0]
@@ -160,3 +180,4 @@ for n=[0]
       end
    end
 end
+=#

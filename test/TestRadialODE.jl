@@ -34,12 +34,12 @@ function compare_to_qnm(
    for a in avals
       om, la = qnm(n,s,m,l,a)
 
-      println("testing: a=$a, ω=$om, Λ=$la")
-      ls, vs = RO.eig_vals_vecs(nr, s, m, a, tomyC(om))
+      ls_c, vs_c = RO.eig_vals_vecs_c(nr, s, m, a, tomyC(om))
+      ls_g, vs_g = RO.eig_vals_vecs_g(nr, s, m, a, tomyC(om))
 
-      println("testing: a=$a, ω=$om, Λ=$la, numerical Λ=$(ls[1])")
+      println("testing: a=$a, ω=$om\nΛ=$la, numerical Cheb Λ=$(ls_c[1]), numerical Geg Λ=$(ls_g[1])")
 
-      @test abs(ls[1]-la)/max(1,abs(la))<tolerance
+      @test abs(ls_c[1]-la)/max(1,abs(la))<tolerance
    end
 end
 

@@ -2,11 +2,28 @@
    Implements basic ideas in 
 
       S. Olver and A. Townsend, 
-      A fast and well-conditioned spectral method, 
-      SIAM Review, 55 (2013), pp. 462–489
+      SIAM review, 2013,
+      arXiv:1202.1347
+
+   For more reviews, see Sec. 3 of 
+
+      A. Townsend and S. Olver,
+      The automatic solution of partial differential 
+      equations using a global spectral method,
+      Journal of Computational Physics, 2015
       arXiv:1409.2789
+   
+   and/or Sec. 6 of 
+      
+      A. Townsend,
+      Computing with functions in two dimensions,
+      PhD Thesis, University of Oxford
+      (can be accessed at https://pi.math.cornell.edu/~ajt/)
+
 """
-module Ultraspherical
+module Gegenbauer 
+
+export compute_S, compute_D, compute_M
 
 include("CustomTypes.jl")
 using .CustomTypes
@@ -51,17 +68,17 @@ function compute_S(n::myI, lam::myI)
       for i=2:(n-2)
          push!(X,i)
          push!(Y,i)
-         push!(V,tomyF(lam/(lam+2.0)))
+         push!(V,tomyF(lam/(lam+i-1.0)))
          push!(X,i)
          push!(Y,i+2)
-         push!(V,tomyF(-lam/(lam+2.0)))
+         push!(V,tomyF(-lam/(lam+i+1.0)))
       end
       push!(X,n-1)
       push!(Y,n-1)
-      push!(V,tomyF(lam/(lam+2.0)))
+      push!(V,tomyF(lam/(lam+n-2.0)))
       push!(X,n)
       push!(Y,n)
-      push!(V,tomyF(lam/(lam+2.0)))
+      push!(V,tomyF(lam/(lam+n-1.0)))
    end
    return sparse(X,Y,V)
 end
@@ -79,8 +96,13 @@ function compute_D(n::myI, lam::myI)
    V = Vector{myF}(undef,0)
    for i=1:(n-lam)
       push!(X,i)
-      push!(Y,i+1+lam)
-      push!(V,tomyF(lam+1.0))
+      push!(Y,i+lam)
+      push!(V,tomyF(lam+i-1))
+   end
+   for i=1:lam
+      push!(X,n-lam+i)
+      push!(Y,n)
+      push!(V,tomyF(0))
    end
    return dropzeros(tomyF((2^(lam-1))*factorial(lam-1)).*sparse(X,Y,V))
 end
@@ -108,14 +130,14 @@ function compute_M(n::myI, lam::myI)
    for i=2:(n-1)
       push!(X,i)
       push!(Y,i+1)
-      push!(V,tomyF(2.0*(lam+i-1)/(2.0*(lam+i))))
+      push!(V,tomyF(((2.0*lam)+i-1)/(2.0*(lam+i))))
       push!(X,i)
       push!(Y,i-1)
-      push!(V,tomyF(1.0/(lam+i-2)))
+      push!(V,tomyF((i-1)/(2.0*(lam+i-2))))
    end
    push!(X,n)
    push!(Y,n-1)
-   push!(V,tomyF(lam/(lam+n-2)))
+   push!(V,tomyF((n-1)/(2.0*(lam+n-2))))
    return sparse(X,Y,V)
 end
 
@@ -123,27 +145,27 @@ end
 """
    compute_D(n::myI, lam::myI)
 
-   Computes n×n D_{λ} matrix over the interval [rmin,rmax].
+   Computes n×n D_{λ} matrix over the interval [xmin,xmax].
 """
-function compute_D(n::myI, lam::myI, rmin::myF, rmax::myF)
+function compute_D(n::myI, lam::myI, xmin::myF, xmax::myF)
    D = compute_D(n,lam)
    
-   a = tomyF(0.5*(rmax-rmin))
+   a = tomyF(0.5*(xmax-xmin))
 
    return dropzeros((a^(-lam)).*D) 
 end
 
 """
-   compute_M(n::myI, lam::myI, rmin::myF, rmax::myF)
+   compute_M(n::myI, lam::myI, xmin::myF, xmax::myF)
 
    Computes n×n M_{λ} matrix for polynomial x over
-   the interval [rmin,rmax].
+   the interval [xmin,xmax].
 """
-function compute_M(n::myI, lam::myI, rmin::myF, rmax::myF)
+function compute_M(n::myI, lam::myI, xmin::myF, xmax::myF)
    M = compute_M(n,lam)
 
-   a = tomyF(0.5*(rmax-rmin))
-   b = tomyF(0.5*(rmax+rmin))
+   a = tomyF(0.5*(xmax-xmin))
+   b = tomyF(0.5*(xmax+xmin))
 
    return dropzeros(a.*M .+ b.*sparse(I,n,n)) 
 end

@@ -3,15 +3,15 @@ module TestChebyshev
 export evaluate_difference, test_convergence, test_X_matrices, test_to_cheb, test_to_cheb_to_real 
 
 include("../src/CustomTypes.jl")
-#include("Norms.jl")
-using .CustomTypes #, .Norms
+include("../src/Chebyshev.jl")
+using .CustomTypes
 
 import Test: @test
 
 const tolerance = 1e-8 ## tolerance we compare to
 
 ##============================================================
-import Chebyshev as CH 
+import .Chebyshev as CH 
 
 """
 One norm 

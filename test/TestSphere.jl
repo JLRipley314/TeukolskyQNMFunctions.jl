@@ -1,10 +1,8 @@
 module TestSphere
 
 include("../src/Sphere.jl")
-include("Norms.jl")
 
 import .Sphere
-import .Norms 
 
 using Test
 

@@ -46,8 +46,8 @@ function F(
    lmin = max(abs(s),abs(mang))
    neig = lang - lmin + 1 # number of eigenvalues
 
-   la_s, _ = SH.eig_vals_vecs(nl, neig, s, mang,  a*om)
-   la_r, _ = RD.eig_vals_vecs(nr,       s, mang, a, om)
+   la_s, _ = SH.eig_vals_vecs_c(nl, neig, s, mang,  a*om)
+   la_r, _ = RD.eig_vals_vecs_c(nr,       s, mang, a, om)
 
    ## The Lambdas are ordered in size of smallest magnitude
    ## to largest magnitude, we ASSUME this is the same as the
@@ -142,8 +142,8 @@ function compute_om(
    lmin = max(abs(s),abs(mang))
    neig = lang - lmin + 1 # number of eigenvalues
 
-   la_s, v_s        = SH.eig_vals_vecs(nl, neig, s, mang,  a*om_np1)
-   la_r, v_r, rvals = RD.eig_vals_vecs(nr,       s, mang, a, om_np1)
+   la_s, v_s        = SH.eig_vals_vecs_c(nl, neig, s, mang,  a*om_np1)
+   la_r, v_r, rvals = RD.eig_vals_vecs_c(nr,       s, mang, a, om_np1)
 
    return om_np1, la_r[1], v_s[:,lang-lmin+1], v_r[:,1], rvals 
 end
