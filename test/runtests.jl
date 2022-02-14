@@ -36,7 +36,7 @@ xmax=tomyF(+1)
 TestGegenbauer.constant_sol_ode(nx,xmin,xmax,c0)
 TestGegenbauer.linear_sol_ode(nx,xmin,xmax,c0,c1)
 TestGegenbauer.airy_sol_ode(nx,xmin,xmax,om2)
-#=
+
 avals = [0.0, 0.354, 0.7, 0.99] ## same as in generate.py
 ###--------------------------------------------------------------
 ## Test convergence of Chebyshev derivatives 
@@ -180,4 +180,3 @@ for n=[0]
       end
    end
 end
-=#
