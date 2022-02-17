@@ -1,6 +1,6 @@
 module TestChebyshev
 
-export evaluate_difference, test_convergence, test_X_matrices, test_to_cheb, test_to_cheb_to_real 
+export test_convergence, test_convergence_fd, test_X_matrices, test_to_cheb, test_to_cheb_to_real 
 
 include("../src/CustomTypes.jl")
 include("../src/Chebyshev.jl")
@@ -24,6 +24,7 @@ function one_norm(v)
    end
    return norm/n
 end
+
 """
 Evaluate derivative compared to analytic value.
 """
@@ -52,6 +53,36 @@ function evaluate_difference(
 
    return norm_d1, norm_d2
 end
+
+"""
+Evaluate finite difference derivative compared to analytic value.
+"""
+function evaluate_difference_fd(
+      nx::myI,
+      xmin::myF,
+      xmax::myF,
+      f::Function,
+      d1f::Function,
+      d2f::Function
+   ) 
+   xvals = CH.cheb_pts(xmin, xmax, nx)
+
+   D1 = CH.mat_fd_D1(xmin, xmax, nx)
+   D2 = CH.mat_fd_D2(xmin, xmax, nx)
+
+   fv   = [f(x)   for x in xvals]
+   d1fv = [d1f(x) for x in xvals]
+   d2fv = [d2f(x) for x in xvals]
+
+   compare_d1fv = D1*fv
+   compare_d2fv = D2*fv
+
+   norm_d1 = one_norm(compare_d1fv .- d1fv)
+   norm_d2 = one_norm(compare_d2fv .- d2fv)
+
+   return norm_d1, norm_d2
+end
+
 """
 Evaluate convergence of the derivative matrices.
 """
@@ -73,6 +104,31 @@ function test_convergence(
 
    @test norm_d1_1/norm_d1_2 > 5.0
    @test norm_d2_1/norm_d2_2 > 5.0
+
+   return nothing
+end
+
+"""
+Evaluate convergence of the finite difference derivative matrices.
+"""
+function test_convergence_fd(
+      nx::myI,
+      xmin::myF,
+      xmax::myF,
+      f::Function,
+      d1f::Function,
+      d2f::Function
+   ) 
+
+   norm_d1_1, norm_d2_1 = evaluate_difference_fd(
+      nx,                          xmin, xmax, f, d1f, d2f
+   )
+   norm_d1_2, norm_d2_2 = evaluate_difference_fd(
+      convert(myI,ceil(2*nx)), xmin, xmax, f, d1f, d2f
+   ) 
+
+   @test norm_d1_1/norm_d1_2 > 3.5   
+   @test norm_d2_1/norm_d2_2 > 3.5
 
    return nothing
 end

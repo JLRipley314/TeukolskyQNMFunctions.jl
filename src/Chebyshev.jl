@@ -3,7 +3,7 @@ Methods for position space Chebyshev methods.
 """
 module Chebyshev 
 
-export chep_pts, mat_X, mat_D1, to_cheb, to_real
+export chep_pts, mat_X, mat_D1, mat_fd_D1, mat_fd_D2, to_cheb, to_real
 
 include("CustomTypes.jl")
 
@@ -106,6 +106,183 @@ function mat_D1(
    M .*= tomyF(2)/(xmax-xmin)
 
    return M 
+end
+
+"""
+    mat_fd_D1(
+      xmin::myF,
+      xmax::myF,
+      nx::myI
+    )::Matrix{myF}
+
+Compute 2nd order finite difference in Chebyshev points.
+"""
+function mat_fd_D1(
+      xmin::myF,
+      xmax::myF,
+      nx::myI
+   )::Matrix{myF}
+   @assert nx>4
+
+   P = zeros(myF,nx,nx)
+   pts = cheb_pts(xmin,xmax,nx)
+   
+   h(i) = pts[i+1] - pts[i]
+  
+   X = Vector{myF}() 
+   Y = Vector{myF}() 
+   V = Vector{myF}() 
+   
+   append!(X,1)
+   append!(Y,1)
+   append!(V,
+      (2*pts[1]-pts[2]-pts[3])
+      /
+      ((pts[1]-pts[2])*(pts[1]-pts[3]))
+     )
+   append!(X,1)
+   append!(Y,2)
+   append!(V,
+      (1.0/(pts[2]-pts[1])) + (1.0/(pts[3]-pts[2]))
+     )
+   append!(X,1)
+   append!(Y,3)
+   append!(V,
+      (pts[1]-pts[2])
+      /
+      ((pts[3]-pts[1])*(pts[3]-pts[2]))
+     )
+
+   for i=2:(nx-1)
+      append!(X,i)
+      append!(Y,i-1)
+      append!(V,-(h(i)/h(i-1))/(h(i-1)+h(i)))
+      append!(X,i)
+      append!(Y,i)
+      append!(V,(1.0/h(i-1)) - (1.0/h(i)))
+      append!(X,i)
+      append!(Y,i+1)
+      append!(V,(h(i-1)/h(i))/(h(i-1)+h(i)))
+   end 
+   
+   append!(X,nx)
+   append!(Y,nx)
+   append!(V,
+      (1.0/(pts[nx]-pts[nx-2])) + (1.0/(pts[nx]-pts[nx-1]))
+     )
+   append!(X,nx)
+   append!(Y,nx-1)
+   append!(V,
+      (pts[nx-2]-pts[nx])
+      /
+      ((pts[nx-2]-pts[nx-1])*(pts[nx-1]-pts[nx]))
+     )
+   append!(X,nx)
+   append!(Y,nx-2)
+   append!(V,
+      (pts[nx]-pts[nx-1])
+      /
+      ((pts[nx-2]-pts[nx-1])*(pts[nx-2]-pts[nx]))
+     )
+
+   return sparse(X,Y,V) 
+end
+
+"""
+    mat_fd_D2(
+      xmin::myF,
+      xmax::myF,
+      nx::myI
+    )::Matrix{myF}
+
+Compute 2nd order finite difference in Chebyshev points.
+"""
+function mat_fd_D2(
+      xmin::myF,
+      xmax::myF,
+      nx::myI
+   )::Matrix{myF}
+   @assert nx>4
+
+   P = zeros(myF,nx,nx)
+   pts = cheb_pts(xmin,xmax,nx)
+   
+   h(i) = pts[i+1] - pts[i]
+  
+   X = Vector{myF}() 
+   Y = Vector{myF}() 
+   V = Vector{myF}() 
+   
+   append!(X,1)
+   append!(Y,1)
+   append!(V,
+      2*(3*pts[1]-pts[2]-pts[3]-pts[4])
+      /
+      ((pts[1]-pts[2])*(pts[1]-pts[3])*(pts[1]-pts[4]))
+     )
+   append!(X,1)
+   append!(Y,2)
+   append!(V,
+      2*(-2*pts[1]+pts[3]+pts[4])
+      /
+      ((pts[1]-pts[2])*(pts[2]-pts[3])*(pts[2]-pts[4]))
+     )
+   append!(X,1)
+   append!(Y,3)
+   append!(V,
+      2*(-2*pts[1]+pts[2]+pts[4])
+      /
+      ((pts[1]-pts[3])*(-pts[2]+pts[3])*(pts[3]-pts[4]))
+     )
+   append!(X,1)
+   append!(Y,4)
+   append!(V,
+      2*(-2*pts[1]+pts[2]+pts[3])
+      /
+      ((pts[2]-pts[4])*(-pts[1]+pts[4])*(-pts[3]+pts[4]))
+     )
+
+   for i=2:(nx-1)
+      append!(X,i)
+      append!(Y,i-1)
+      append!(V,(2.0/h(i-1))/(h(i-1)+h(i)))
+      append!(X,i)
+      append!(Y,i)
+      append!(V,- 2.0/(h(i-1)*h(i)))
+      append!(X,i)
+      append!(Y,i+1)
+      append!(V,(2.0/h(i))/(h(i-1)+h(i)))
+   end 
+   append!(X,nx)
+   append!(Y,nx)
+   append!(V,
+      2*(3*pts[nx]-pts[nx-1]-pts[nx-2]-pts[nx-3])
+      /
+      ((pts[nx]-pts[nx-1])*(pts[nx]-pts[nx-2])*(pts[nx]-pts[nx-3]))
+     )
+   append!(X,nx)
+   append!(Y,nx-1)
+   append!(V,
+      2*(-2*pts[nx]+pts[nx-2]+pts[nx-3])
+      /
+      ((pts[nx]-pts[nx-1])*(pts[nx-1]-pts[nx-2])*(pts[nx-1]-pts[nx-3]))
+     )
+   append!(X,nx)
+   append!(Y,nx-2)
+   append!(V,
+      2*(-2*pts[nx]+pts[nx-1]+pts[nx-3])
+      /
+      ((pts[nx]-pts[nx-2])*(-pts[nx-1]+pts[nx-2])*(pts[nx-2]-pts[nx-3]))
+     )
+   append!(X,nx)
+   append!(Y,nx-3)
+   append!(V,
+      2*(-2*pts[nx]+pts[nx-1]+pts[nx-2])
+      /
+      ((pts[nx-1]-pts[nx-3])*(-pts[nx]+pts[nx-3])*(-pts[nx-2]+pts[nx-3]))
+     )
+
+   return sparse(X,Y,V) 
 end
 
 """

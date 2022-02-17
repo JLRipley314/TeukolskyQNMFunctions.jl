@@ -1,7 +1,6 @@
 module TestSphere
 
 include("../src/Sphere.jl")
-
 import .Sphere
 
 using Test

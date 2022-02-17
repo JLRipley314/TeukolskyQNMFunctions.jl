@@ -3,17 +3,17 @@ module TestSpheroidal
 export test_m_symmetry, test_s_symmetry, test_conj_symmetry, compare_to_qnm
 
 include("../src/CustomTypes.jl")
+include("../src/Spheroidal.jl")
 include("ReadQNM.jl")
 using .CustomTypes
 using .ReadQNM
+import .Spheroidal as SH
 
 import Test: @test
 
 const tolerance = 1e-8 ## tolerance we compare to
 
 ##============================================================
-import Spheroidal as SH
-
 """
 Test la_{s,l,m,n}(-c) = la_{s,l,-m,n}(c) 
 """

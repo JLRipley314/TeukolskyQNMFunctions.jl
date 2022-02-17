@@ -1,7 +1,6 @@
 module TestQuasinormalModes
 
-push!(LOAD_PATH,"../src/")
-
+include("../src/CustomTypes.jl")
 using CustomTypes
 
 const tolerance = 1e-4 ## tolerance we compare to

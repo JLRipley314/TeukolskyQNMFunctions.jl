@@ -23,10 +23,12 @@
 """
 module Gegenbauer 
 
-export compute_S, compute_D, compute_M
+export compute_S, compute_D, compute_MX1, compute_MXp
 
 include("CustomTypes.jl")
+include("Chebyshev.jl")
 using .CustomTypes
+using .Chebyshev
 using LinearAlgebra, SparseArrays
 
 """
@@ -108,7 +110,7 @@ function compute_D(n::myI, lam::myI)
 end
 
 """
-   compute_M(n::myI, lam::myI)
+   compute_MX1(n::myI, lam::myI)
 
    Computes n×n M_{λ} matrix for polynomial x.
    For a simple derivation see Sec. 6.3.1 of
@@ -118,7 +120,7 @@ end
    This can be accessed at
    https://pi.math.cornell.edu/~ajt/
 """
-function compute_M(n::myI, lam::myI)
+function compute_MX1(n::myI, lam::myI)
    @assert lam>=1
    @assert n>=lam
    X = Vector{myI}(undef,0)
@@ -141,6 +143,74 @@ function compute_M(n::myI, lam::myI)
    return sparse(X,Y,V)
 end
 
+"""
+   compute_MCp(n::myI, lam::myI, p::myI)
+
+   Computes n×n M_{λ} matrix for polynomial C^{λ}_p.
+   For a simple derivation see Sec. 6.3.1 of
+      Computing with functions in two dimensions,
+      Townsend, Alex
+      PhD Thesis, University of Oxford
+   This can be accessed at
+   https://pi.math.cornell.edu/~ajt/
+"""
+function compute_MCp(n::myI, lam::myI, p::myI)
+   @assert p>=0
+
+   MX0 = sparse(I,n,n)
+   MX1 = compute_MX1(n,lam)
+   
+   if p==0
+      return MX0
+   elseif p==1
+      return (2.0*lam).*MX1
+   else
+      MCp1 = deepcopy(sparse(I,n,n))
+      MC   = deepcopy((2.0*lam).*MX1) 
+      MCm1 = deepcopy(MX0) 
+
+      for k=1:(p-1)
+         MCp1 = (
+            (2.0*(k+lam)/(k+1)).*(MX1*MC)
+            -
+            ((k-1+2*lam)/(k+1)).*MCm1
+           )
+         MCm1 = deepcopy(MC)
+         MC   = deepcopy(MCp1)
+      end
+      return MCp1
+   end
+end
+
+"""
+   compute_MXp(n::myI, lam::myI, p::myI)
+
+   Computes n×n M_{λ} matrix for polynomial x_p.
+   For a simple derivation see Sec. 6.3.1 of
+      Computing with functions in two dimensions,
+      Townsend, Alex
+      PhD Thesis, University of Oxford
+   This can be accessed at
+   https://pi.math.cornell.edu/~ajt/
+"""
+function compute_MXp(n::myI, lam::myI, p::myI)
+   @assert p>=0
+
+   MCp = compute_MCp(n,lam,p)
+
+   if p==0
+      return dropzeros(MCp)
+   elseif p==1
+      return dropzeros((0.5/lam).*MCp)
+   elseif p==2
+      MC0 = compute_MCp(n,lam,0)
+      return dropzeros(((0.5/lam)/(1.0+lam)).*(MCp + lam.*MC0)) 
+   elseif p==3
+      return nothing
+   elseif p==4
+      return nothing
+   end
+end
 
 """
    compute_D(n::myI, lam::myI)
@@ -156,18 +226,32 @@ function compute_D(n::myI, lam::myI, xmin::myF, xmax::myF)
 end
 
 """
-   compute_M(n::myI, lam::myI, xmin::myF, xmax::myF)
+   compute_MXp(n::myI, lam::myI, p::myI, xmin::myF, xmax::myF)
 
-   Computes n×n M_{λ} matrix for polynomial x over
-   the interval [xmin,xmax].
+   Computes n×n M_{λ} matrix for polynomial x_p over the interval [xmin,xmax].
 """
-function compute_M(n::myI, lam::myI, xmin::myF, xmax::myF)
-   M = compute_M(n,lam)
+function compute_MXp(n::myI, lam::myI, p::myI, xmin::myF, xmax::myF)
 
    a = tomyF(0.5*(xmax-xmin))
    b = tomyF(0.5*(xmax+xmin))
 
-   return dropzeros(a.*M .+ b.*sparse(I,n,n)) 
+   if p==0
+      return compute_MXp(n,lam,0)
+   elseif p==1
+      return dropzeros(
+               a*compute_MXp(n,lam,1) 
+               + 
+               b*compute_MXp(n,lam,0)
+              )
+   elseif p==2
+      return dropzeros(
+               (a^2)*compute_MXp(n,lam,2) 
+               + 
+               2*a*b*compute_MXp(n,lam,1)
+               + 
+               (b^2)*compute_MXp(n,lam,0)
+              )
+   end
 end
 
 end

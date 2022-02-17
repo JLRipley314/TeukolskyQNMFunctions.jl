@@ -22,19 +22,6 @@ import .TestSpheroidal
 
 import .Spheroidal: compute_l_min, eig_vals_vecs
 
-###--------------------------------------------------------------
-## Test Gegenbauer polynomial 
-##--------------------------------------------------------------
-nx=tomyI(20)
-c0=tomyF(1.3243)
-c1=tomyF(2.3)
-om2=tomyF(1.0)
-xmin=tomyF(-2.2321)
-xmax=tomyF(+1.932)
-TestGegenbauer.constant_sol_ode(nx,xmin,xmax,c0)
-TestGegenbauer.linear_sol_ode(nx,xmin,xmax,c0,c1)
-TestGegenbauer.airy_sol_ode(nx,xmin,xmax,om2)
-
 avals = [0.0, 0.354, 0.7, 0.99] ## same as in generate.py
 ###--------------------------------------------------------------
 ## Test convergence of Chebyshev derivatives 
@@ -46,12 +33,14 @@ xmax = tomyF(10.3)
 f(x)   =      sin(2.0*x)
 d1f(x) =  2.0*cos(2.0*x)
 d2f(x) = -4.0*sin(2.0*x)
-TestChebyshev.test_convergence(nx, xmin, xmax, f, d1f, d2f) 
+TestChebyshev.test_convergence(   nx, xmin, xmax, f, d1f, d2f) 
+TestChebyshev.test_convergence_fd(nx, xmin, xmax, f, d1f, d2f) 
 
 f(x)   =      exp(-2.0*x)
 d1f(x) = -2.0*exp(-2.0*x)
 d2f(x) =  4.0*exp(-2.0*x)
-TestChebyshev.test_convergence(nx, xmin, xmax, f, d1f, d2f) 
+TestChebyshev.test_convergence(   nx, xmin, xmax, f, d1f, d2f) 
+TestChebyshev.test_convergence_fd(nx, xmin, xmax, f, d1f, d2f) 
 
 TestChebyshev.test_X_matrices(nx, xmin, xmax) 
 
@@ -66,6 +55,8 @@ xmin = tomyF(0.0)
 xmax = tomyF(1.0)
 
 TestCHLaplacian.interval_laplacian(nx,neig,xmin,xmax)
+nx = tomyI(1024) 
+TestCHLaplacian.interval_laplacian_fd(nx,neig,xmin,xmax)
 ##--------------------------------------------------------------
 ## Testing spherical function 
 ##--------------------------------------------------------------
@@ -105,6 +96,24 @@ TestSphere.test_norm_swal_lap(48,-1,5,23)
 TestSphere.test_norm_swal_lap(48, 0,5,23)
 TestSphere.test_norm_swal_lap(48, 1,5,23)
 TestSphere.test_norm_swal_lap(48, 2,5,23)
+###--------------------------------------------------------------
+## Test Gegenbauer polynomial 
+##--------------------------------------------------------------
+#=
+nx=tomyI(20)
+c0=tomyF(1.3243)
+c1=tomyF(2.3)
+om2=tomyF(1.0)
+xmin=tomyF(-2.2321)
+xmax=tomyF(+1.932)
+TestGegenbauer.constant_sol_ode(nx,xmin,xmax,c0)
+TestGegenbauer.linear_sol_ode(nx,xmin,xmax,c0,c1)
+TestGegenbauer.airy_sol_ode(nx,xmin,xmax,om2)
+n=tomyI(1)
+a=tomyF(1.0)
+b=tomyF(1.0)
+TestGegenbauer.jacobi_sol_ode(6,n,a,b)
+=#
 ##--------------------------------------------------------------
 ## Testing spheroidal functions 
 ##--------------------------------------------------------------

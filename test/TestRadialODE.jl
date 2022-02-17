@@ -5,13 +5,14 @@ export compare_to_qnm
 const tolerance = 1e-3 ## tolerance we compare to
 
 include("../src/CustomTypes.jl")
+include("../src/RadialODE.jl")
 include("ReadQNM.jl")
 using .CustomTypes
 using .ReadQNM
+import .RadialODE as RO
 import Test: @test
 
 ##============================================================
-import RadialODE as RO
 
 """
 Compare against values computed by Leo Stein's qnm code,
@@ -35,9 +36,8 @@ function compare_to_qnm(
       om, la = qnm(n,s,m,l,a)
 
       ls_c, vs_c = RO.eig_vals_vecs_c(nr, s, m, a, tomyC(om))
-      ls_g, vs_g = RO.eig_vals_vecs_g(nr, s, m, a, tomyC(om))
 
-      println("testing: a=$a, ω=$om\nΛ=$la, numerical Cheb Λ=$(ls_c[1]), numerical Geg Λ=$(ls_g[1])")
+      #println("testing: a=$a, ω=$om\nΛ=$la, Cheb Λ=$(ls_c[1])")
 
       @test abs(ls_c[1]-la)/max(1,abs(la))<tolerance
    end
