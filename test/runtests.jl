@@ -23,6 +23,7 @@ import .TestSpheroidal
 import .Spheroidal: compute_l_min, eig_vals_vecs
 
 avals = [0.0, 0.354, 0.7, 0.99] ## same as in generate.py
+
 ###--------------------------------------------------------------
 ## Test convergence of Chebyshev derivatives 
 ##--------------------------------------------------------------

@@ -24,8 +24,8 @@ import .RadialODE  as RD
       nr::myI,
       nl::myI,
       s::myI,
-      lang::myI,
-      mang::myI,
+      l::myI,
+      m::myI,
       a::myF,
       om::myC
     )::myF
@@ -37,24 +37,24 @@ function F(
       nr::myI,
       nl::myI,
       s::myI,
-      lang::myI,
-      mang::myI,
+      l::myI,
+      m::myI,
       a::myF,
       om::myC
    )::myF
 
-   lmin = max(abs(s),abs(mang))
-   neig = lang - lmin + 1 # number of eigenvalues
+   lmin = max(abs(s),abs(m))
+   neig = l - lmin + 1 # number of eigenvalues
 
-   la_s, _ = SH.eig_vals_vecs_c(nl, neig, s, mang,  a*om)
-   la_r, _ = RD.eig_vals_vecs_c(nr,       s, mang, a, om)
+   la_s, _ = SH.eig_vals_vecs(nl, neig, s, m,  a*om)
+   la_r, _ = RD.eig_vals_vecs_c(nr,       s, m, a, om)
 
    ## The Lambdas are ordered in size of smallest magnitude
    ## to largest magnitude, we ASSUME this is the same as the
    ## ordering of the l-angular indexing (this may not
    ## hold when a->1; need to check).
 
-   return abs(la_s[lang-lmin+1] - la_r[1])
+   return abs(la_s[l-lmin+1] - la_r[1])
 end
 
 """
@@ -62,8 +62,8 @@ end
       nr::myI,
       nl::myI,
       s::myI,
-      lang::myI,
-      mang::myI,
+      l::myI,
+      m::myI,
       a::myF,
       om::myC; 
       tolerance::myF=tomyF(1e-6),
@@ -82,20 +82,20 @@ using Newton's method.
 
 # Arguments
 
-* `nr`:   number of radial Chebyshev collocation points
-* `nl`:   number of spherical harmonic terms
-* `s`:    spin of the field in the Teukolsky equation
-* `lang`: l angular number
-* `mang`: m angular number
-* `a`:    black hole spin
-* `om`:   guess for the initial quasinormal mode
+* `nr`: number of radial Chebyshev collocation points
+* `nl`: number of spherical harmonic terms
+* `s`:  spin of the field in the Teukolsky equation
+* `l`:  l angular number
+* `m`:  m angular number
+* `a`:  black hole spin
+* `om`: guess for the initial quasinormal mode
 """
 function compute_om(
       nr::myI,
       nl::myI,
       s::myI,
-      lang::myI,
-      mang::myI,
+      l::myI,
+      m::myI,
       a::myF,
       om::myC; 
       tolerance::myF=tomyF(1e-6),
@@ -112,7 +112,7 @@ function compute_om(
    om_n   = tomyC(-1000)
    om_np1 = om 
 
-   f(omega) = F(nr,nl,s,lang,mang,a,omega)
+   f(omega) = F(nr,nl,s,l,m,a,omega)
 
    ## Newton search with 2nd order finite differences
 
@@ -139,13 +139,13 @@ function compute_om(
       end
    end
   
-   lmin = max(abs(s),abs(mang))
-   neig = lang - lmin + 1 # number of eigenvalues
+   lmin = max(abs(s),abs(m))
+   neig = l - lmin + 1 # number of eigenvalues
 
-   la_s, v_s        = SH.eig_vals_vecs_c(nl, neig, s, mang,  a*om_np1)
-   la_r, v_r, rvals = RD.eig_vals_vecs_c(nr,       s, mang, a, om_np1)
+   la_s, v_s        = SH.eig_vals_vecs(  nl, neig, s, m,  a*om_np1)
+   la_r, v_r, rvals = RD.eig_vals_vecs_c(nr,       s, m, a, om_np1)
 
-   return om_np1, la_r[1], v_s[:,lang-lmin+1], v_r[:,1], rvals 
+   return om_np1, la_r[1], v_s[:,l-lmin+1], v_r[:,1], rvals 
 end
 
 end # module
