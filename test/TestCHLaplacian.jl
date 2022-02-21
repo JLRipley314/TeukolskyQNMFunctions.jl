@@ -59,7 +59,7 @@ function interval_laplacian_fd(
    D2[1,1]      = 1.0
    D2[1,2:end] .= 0.0
    
-   D2[nx,nx]      = 1.0
+   D2[end,end]      = 1.0
    D2[nx,1:end-1] .= 0.0
 
    t = eigvals(D2,sortby=abs)
