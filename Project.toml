@@ -14,7 +14,7 @@ SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 [compat]
 FastGaussQuadrature = "0.4"
 GenericSchur = "0.5"
-Jacobi = "0.5"
+Jacobi = "0.4"
 julia = "1.6"
 
 [extras]
