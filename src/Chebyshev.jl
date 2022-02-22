@@ -94,11 +94,18 @@ function mat_D1(
       M[i, 1] = tomyF(-0.5)*((-1)^(i+1 )/(tomyF(1) - pts[i]))
       M[i,nx] = tomyF(0.5) *((-1)^(i+nx)/(tomyF(1) + pts[i])) 
 
-      M[i,i] = tomyF(-0.5)*pts[i]/((tomyF(1) + pts[i])*(tomyF(1) - pts[i]))
-
       for j=2:(nx-1)
          if i!=j
             M[i,j] = ((tomyF(-1))^(i+j))/(pts[i] - pts[j])
+         end
+      end
+   end
+
+   for i=1:(nx-1)
+      M[i,i] = 0.0 
+      for j=1:nx
+         if i!=j
+            M[i,i] -= M[i,j]
          end
       end
    end

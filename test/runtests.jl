@@ -50,14 +50,16 @@ TestChebyshev.test_to_cheb_to_real(nx, xmin, xmax)
 ##--------------------------------------------------------------
 ## Test Chebyshev second derivative 
 ##--------------------------------------------------------------
-nx   = tomyI(512) 
+nx   = tomyI(40) 
 neig = tomyI(4)
-xmin = tomyF(0.0)
+xmin = tomyF(-1.0)
 xmax = tomyF(1.0)
 
-TestCHLaplacian.interval_laplacian(nx,neig,xmin,xmax)
-nx = tomyI(1024) 
+TestCHLaplacian.interval_laplacian_ch(nx,neig,xmin,xmax)
+nx = tomyI(320) 
 TestCHLaplacian.interval_laplacian_fd(nx,neig,xmin,xmax)
+#nx  = tomyI(40)
+#TestCHLaplacian.interval_laplacian_chs(nx,neig,xmin,xmax)
 ##--------------------------------------------------------------
 ## Testing spherical function 
 ##--------------------------------------------------------------
