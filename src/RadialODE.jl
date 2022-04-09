@@ -17,8 +17,10 @@ using GenericSchur
 using SparseArrays
 using Printf: @printf 
 
+using ApproxFun
+
 """
-    radial_discretized_eqn_c(
+    radial_discretized_eqn(
       nr::myI,
       s::myI,
       m::myI,
@@ -29,7 +31,7 @@ using Printf: @printf
       rmax::myF
     )
 """
-function radial_discretized_eqn_c(
+function radial_discretized_eqn(
       nr::myI,
       s::myI,
       m::myI,
@@ -39,6 +41,8 @@ function radial_discretized_eqn_c(
       rmin::myF,
       rmax::myF
 )
+   ## Using position space method 
+   #=
    D1 = CH.mat_D1(rmin,rmax,nr)
    D2 = D1*D1    
 
@@ -48,9 +52,18 @@ function radial_discretized_eqn_c(
    X2 = X1*X1
    X3 = X1*X2
    X4 = X1*X3
-
+   =#
+  
+   ## Using Ultraspherical polynomial method
+   X1 = ApproxFun.Fun(rmin..rmax);
+   X2 = X1^2
+   X3 = X1^3
+   X4 = X1^4
+   D1 = ApproxFun.Derivative()
+   D2 = D1^2 
+   
    A = (
-        tomyC(2*im)*om*Id
+        tomyC(2*im)*om*I
         -
         tomyF(2)*(tomyF(1) + s)*X1
         +
@@ -69,7 +82,7 @@ function radial_discretized_eqn_c(
       ((a^2) - tomyF(16)*(bhm^2))*(om^2) 
       + 
       tomyF(2)*(m*a + tomyF(2)*im*s*bhm)*om
-     )*Id
+     )*I
      +
      tomyF(2)*(
       tomyF(4)*((a^2) - tomyF(4)*(bhm^2))*bhm*(om^2)
@@ -97,7 +110,7 @@ function radial_discretized_eqn_c(
       A*D1
       +
       B
-   )
+   ) : ApproxFun.space(X1)
 end
 
 """
@@ -229,14 +242,16 @@ function eig_vals_vecs_c(
    rmin = tomyF(0)
    rmax = tomyF(abs(a)>0 ? (bhm/(a^2))*(tomyF(1) - sqrt(tomyF(1)- ((a/bhm)^2))) : tomyF(0.5)/bhm)
    
-   Mat = radial_discretized_eqn_c(nr,s,m,a,bhm,om,rmin,rmax)
-   t = eigen(Matrix(Mat), permute=true, scale=true, sortby=abs)
+   L = radial_discretized_eqn(nr,s,m,a,bhm,om,rmin,rmax)
+   t = ApproxFun.eigs(L,nr,tolerance=1e-12) 
+
+   mini = argmin(abs.(t[1]))
 
    #nMat = radial_discretized_eqn_p(nr,s,m,a,bhm,om)
    #nt = eigen(Matrix(nMat), permute=true, scale=true, sortby=abs)
    #println(nMat)
 
-   return -t.values, t.vectors, CH.cheb_pts(rmin,rmax,nr)
+   return -t[1][mini], t[2][mini], CH.cheb_pts(rmin,rmax,nr)
 end
 
 end # module

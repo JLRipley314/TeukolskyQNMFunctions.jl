@@ -39,7 +39,8 @@ function compare_to_qnm(
 
       #println("testing: a=$a, ω=$om\nΛ=$la, Cheb Λ=$(ls_c[1])")
 
-      @test abs(ls_c[1]-la)/max(1,abs(la))<tolerance
+      println(abs(ls_c - la))
+      @test abs(ls_c - la)/max(1,abs(la))<tolerance
    end
 end
 

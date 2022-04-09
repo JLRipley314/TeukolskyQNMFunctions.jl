@@ -47,14 +47,14 @@ function F(
    neig = l - lmin + 1 # number of eigenvalues
 
    la_s, _ = SH.eig_vals_vecs(nl, neig, s, m,  a*om)
-   la_r, _ = RD.eig_vals_vecs_c(nr,       s, m, a, om)
+   la_r, _ = RD.eig_vals_vecs_c(nr,     s, m, a, om)
 
    ## The Lambdas are ordered in size of smallest magnitude
    ## to largest magnitude, we ASSUME this is the same as the
    ## ordering of the l-angular indexing (this may not
    ## hold when a->1; need to check).
 
-   return abs(la_s[l-lmin+1] - la_r[1])
+   return abs(la_s[l-lmin+1] - la_r)
 end
 
 """
@@ -145,7 +145,7 @@ function compute_om(
    la_s, v_s        = SH.eig_vals_vecs(  nl, neig, s, m,  a*om_np1)
    la_r, v_r, rvals = RD.eig_vals_vecs_c(nr,       s, m, a, om_np1)
 
-   return om_np1, la_r[1], v_s[:,l-lmin+1], v_r[:,1], rvals 
+   return om_np1, la_r, v_s[:,l-lmin+1], v_r, rvals 
 end
 
 end # module

@@ -3,7 +3,7 @@ Methods for position space Chebyshev methods.
 """
 module Chebyshev 
 
-export chep_pts, mat_X, mat_D1, mat_fd_D1, mat_fd_D2, to_cheb, to_real
+export chep_pts, mat_X, mat_D1, mat_D2, mat_fd_D1, mat_fd_D2, to_cheb, to_real
 
 include("CustomTypes.jl")
 
@@ -72,6 +72,59 @@ end
 Computes derivative matrix D1 in real space.
 """
 function mat_D1(
+      xmin::myF,
+      xmax::myF,
+      nx::myI
+   )::Matrix{myF}
+   @assert nx>4
+
+   M = Matrix{myF}(undef,nx,nx)
+   n = nx-1
+   pts = cheb_pts(nx)
+   
+   M[1,1]   = (tomyF(2)*(n^2) + tomyF(1)) / tomyF(6)
+   M[nx,nx] = -M[1,1]
+
+   M[1,nx] = tomyF(0.5)*((-1.0)^n) 
+   M[nx,1] = -M[1,nx] 
+
+   for i=2:(nx-1)
+      M[1 ,i] = tomyF(2.0) *((-1)^(i+1 )/(tomyF(1) - pts[i]))
+      M[nx,i] = tomyF(-2.0)*((-1)^(i+nx)/(tomyF(1) + pts[i])) 
+      M[i, 1] = tomyF(-0.5)*((-1)^(i+1 )/(tomyF(1) - pts[i]))
+      M[i,nx] = tomyF(0.5) *((-1)^(i+nx)/(tomyF(1) + pts[i])) 
+
+      for j=2:(nx-1)
+         if i!=j
+            M[i,j] = ((tomyF(-1))^(i+j))/(pts[i] - pts[j])
+         end
+      end
+   end
+
+   for i=1:(nx-1)
+      M[i,i] = 0.0 
+      for j=1:nx
+         if i!=j
+            M[i,i] -= M[i,j]
+         end
+      end
+   end
+
+   M .*= tomyF(2)/(xmax-xmin)
+
+   return M 
+end
+
+"""
+    mat_D2(
+      xmin::myF,
+      xmax::myF,
+      nx::myI
+    )::Matrix{myF}
+
+Computes derivative matrix D1 in real space.
+"""
+function mat_D2(
       xmin::myF,
       xmax::myF,
       nx::myI

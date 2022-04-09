@@ -171,13 +171,18 @@ end
 ##--------------------------------------------------------------
 ## Testing Radial ODE QNM 
 ##--------------------------------------------------------------
-nr = 80 
+nr = 144
 
-for n=[0]
+for n=[0,1]
    for s=-2:0
+      mvals = [abs(s)]
       for m=[-2,0,1]
          lmin = compute_l_min(s,m)
-         for l=lmin:(lmin+1)
+         lvals = [lmin]
+         if n==0
+            mvals = lmin:(lmin+1) 
+         end  
+         for l=lvals
             TestRadialODE.compare_to_qnm(
                   tomyI(nr),
                   tomyI(s),
