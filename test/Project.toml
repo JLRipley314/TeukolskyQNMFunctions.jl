@@ -1,4 +1,5 @@
 [deps]
+ApproxFun = "28f2ccd6-bb30-5033-b560-165f7b14dc2f"
 FastGaussQuadrature = "442a2c76-b920-505d-bb47-c5924d526838"
 GenericSchur = "c145ed77-6b09-5dd9-b285-bf645a82121e"
 Jacobi = "83f21c0b-4282-5fbc-9e3f-f6da3d2e584c"
