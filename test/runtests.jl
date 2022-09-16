@@ -6,7 +6,6 @@ include("../src/TeukolskyQNMFunctions.jl")
 
 include("TestCHLaplacian.jl")
 include("TestChebyshev.jl")
-include("TestGegenbauer.jl")
 include("TestRadialODE.jl")
 include("TestSphere.jl")
 include("TestSpheroidal.jl")
@@ -15,7 +14,6 @@ using .CustomTypes, ..TeukolskyQNMFunctions
 
 import .TestCHLaplacian 
 import .TestChebyshev 
-import .TestGegenbauer 
 import .TestRadialODE
 import .TestSphere
 import .TestSpheroidal
@@ -99,24 +97,6 @@ TestSphere.test_norm_swal_lap(48,-1,5,23)
 TestSphere.test_norm_swal_lap(48, 0,5,23)
 TestSphere.test_norm_swal_lap(48, 1,5,23)
 TestSphere.test_norm_swal_lap(48, 2,5,23)
-###--------------------------------------------------------------
-## Test Gegenbauer polynomial 
-##--------------------------------------------------------------
-#=
-nx=tomyI(20)
-c0=tomyF(1.3243)
-c1=tomyF(2.3)
-om2=tomyF(1.0)
-xmin=tomyF(-2.2321)
-xmax=tomyF(+1.932)
-TestGegenbauer.constant_sol_ode(nx,xmin,xmax,c0)
-TestGegenbauer.linear_sol_ode(nx,xmin,xmax,c0,c1)
-TestGegenbauer.airy_sol_ode(nx,xmin,xmax,om2)
-n=tomyI(1)
-a=tomyF(1.0)
-b=tomyF(1.0)
-TestGegenbauer.jacobi_sol_ode(6,n,a,b)
-=#
 ##--------------------------------------------------------------
 ## Testing spheroidal functions 
 ##--------------------------------------------------------------
