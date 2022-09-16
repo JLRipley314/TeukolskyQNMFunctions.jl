@@ -102,12 +102,7 @@ function compute_om(
       epsilon::myF=tomyF(1e-6),
       gamma::myF=tomyF(1),
       verbose::Bool=false
-   )::Tuple{
-            myC,
-            myC,
-            Vector{myC},
-            Vector{myC},
-            Vector{myF}}
+   )
 
    om_n   = tomyC(-1000)
    om_np1 = om 
@@ -134,6 +129,7 @@ function compute_om(
             (f(om_n+im*epsilon) - f(om_n-im*epsilon))/(tomyF(2)*im*epsilon)
            )
       om_np1 = om_n - newgamma*f(om_n)/df
+      
       if verbose==true
          println("om_np1=$om_np1\tdf=$df\tdiff=$(abs(om_np1-om_n))")
       end

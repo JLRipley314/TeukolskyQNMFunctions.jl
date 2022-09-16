@@ -243,15 +243,15 @@ function eig_vals_vecs_c(
    rmax = tomyF(abs(a)>0 ? (bhm/(a^2))*(tomyF(1) - sqrt(tomyF(1)- ((a/bhm)^2))) : tomyF(0.5)/bhm)
    
    L = radial_discretized_eqn(nr,s,m,a,bhm,om,rmin,rmax)
-   t = ApproxFun.eigs(L,nr,tolerance=1e-12) 
+   evals, evecs = ApproxFun.eigs(L,nr,tolerance=1e-12) 
 
-   mini = argmin(abs.(t[1]))
+   min_i = argmin(evals[1])
 
    #nMat = radial_discretized_eqn_p(nr,s,m,a,bhm,om)
    #nt = eigen(Matrix(nMat), permute=true, scale=true, sortby=abs)
    #println(nMat)
 
-   return -t[1][mini], t[2][mini], CH.cheb_pts(rmin,rmax,nr)
+   return -evals[min_i], evecs[min_i], CH.cheb_pts(rmin,rmax,nr)
 end
 
 end # module
