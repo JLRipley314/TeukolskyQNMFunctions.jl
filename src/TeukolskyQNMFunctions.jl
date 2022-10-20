@@ -5,7 +5,7 @@ using a horizon penetrating, hyperboloidally compactified coordinate system.
 The main advantage of using these coordinates is that the quasinormal
 wavefunctions are finite valued from the black hole to future null infinity.
 """
-module TeukolskyQNMFunctions 
+module TeukolskyQNMFunctions
 
 export F, compute_om
 
@@ -16,8 +16,7 @@ include("RadialODE.jl")
 using .CustomTypes
 
 import .Spheroidal as SH
-import .RadialODE  as RD 
-
+import .RadialODE as RD
 
 """
     F(
@@ -33,28 +32,20 @@ import .RadialODE  as RD
 Absolute difference of Lambda seperation constant
 for radial and angular ODEs.
 """
-function F(
-      nr::myI,
-      nl::myI,
-      s::myI,
-      l::myI,
-      m::myI,
-      a::myF,
-      om::myC
-   )::myF
+function F(nr::myI, nl::myI, s::myI, l::myI, m::myI, a::myF, om::myC)::myF
 
-   lmin = max(abs(s),abs(m))
-   neig = l - lmin + 1 # number of eigenvalues
+    lmin = max(abs(s), abs(m))
+    neig = l - lmin + 1 # number of eigenvalues
 
-   la_s, _ = SH.eig_vals_vecs(nl, neig, s, m,  a*om)
-   la_r, _ = RD.eig_vals_vecs_c(nr,     s, m, a, om)
+    la_s, _ = SH.eig_vals_vecs(nl, neig, s, m, a * om)
+    la_r, _ = RD.eig_vals_vecs_c(nr, s, m, a, om)
 
-   ## The Lambdas are ordered in size of smallest magnitude
-   ## to largest magnitude, we ASSUME this is the same as the
-   ## ordering of the l-angular indexing (this may not
-   ## hold when a->1; need to check).
+    ## The Lambdas are ordered in size of smallest magnitude
+    ## to largest magnitude, we ASSUME this is the same as the
+    ## ordering of the l-angular indexing (this may not
+    ## hold when a->1; need to check).
 
-   return abs(la_s[l-lmin+1] - la_r)
+    return abs(la_s[l-lmin+1] - la_r)
 end
 
 """
@@ -91,57 +82,56 @@ using Newton's method.
 * `om`: guess for the initial quasinormal mode
 """
 function compute_om(
-      nr::myI,
-      nl::myI,
-      s::myI,
-      l::myI,
-      m::myI,
-      a::myF,
-      om::myC; 
-      tolerance::myF=tomyF(1e-6),
-      epsilon::myF=tomyF(1e-6),
-      gamma::myF=tomyF(1),
-      verbose::Bool=false
-   )
+    nr::myI,
+    nl::myI,
+    s::myI,
+    l::myI,
+    m::myI,
+    a::myF,
+    om::myC;
+    tolerance::myF = tomyF(1e-6),
+    epsilon::myF = tomyF(1e-6),
+    gamma::myF = tomyF(1),
+    verbose::Bool = false,
+)
 
-   om_n   = tomyC(-1000)
-   om_np1 = om 
+    om_n = tomyC(-1000)
+    om_np1 = om
 
-   f(omega) = F(nr,nl,s,l,m,a,omega)
+    f(omega) = F(nr, nl, s, l, m, a, omega)
 
-   ## Newton search with 2nd order finite differences
+    ## Newton search with 2nd order finite differences
 
-   newgamma = gamma
-   iterations = 1
-   while abs(om_np1 - om_n) > tolerance 
+    newgamma = gamma
+    iterations = 1
+    while abs(om_np1 - om_n) > tolerance
 
-      ## if too many iterations, reduce search step size
-      iterations += 1
-      if iterations%100 == 0
-         newgamma /= tomyF(2) 
-      end
-     
-      om_n = om_np1
+        ## if too many iterations, reduce search step size
+        iterations += 1
+        if iterations % 100 == 0
+            newgamma /= tomyF(2)
+        end
 
-      df = (
-            (f(om_n+epsilon)    - f(om_n-epsilon)   )/(tomyF(2)*epsilon)
-            +
-            (f(om_n+im*epsilon) - f(om_n-im*epsilon))/(tomyF(2)*im*epsilon)
-           )
-      om_np1 = om_n - newgamma*f(om_n)/df
-      
-      if verbose==true
-         println("om_np1=$om_np1\tdf=$df\tdiff=$(abs(om_np1-om_n))")
-      end
-   end
-  
-   lmin = max(abs(s),abs(m))
-   neig = l - lmin + 1 # number of eigenvalues
+        om_n = om_np1
 
-   la_s, v_s        = SH.eig_vals_vecs(  nl, neig, s, m,  a*om_np1)
-   la_r, v_r, rvals = RD.eig_vals_vecs_c(nr,       s, m, a, om_np1)
+        df = (
+            (f(om_n + epsilon) - f(om_n - epsilon)) / (tomyF(2) * epsilon) +
+            (f(om_n + im * epsilon) - f(om_n - im * epsilon)) / (tomyF(2) * im * epsilon)
+        )
+        om_np1 = om_n - newgamma * f(om_n) / df
 
-   return om_np1, la_r, v_s[:,l-lmin+1], v_r, rvals 
+        if verbose == true
+            println("om_np1=$om_np1\tdf=$df\tdiff=$(abs(om_np1-om_n))")
+        end
+    end
+
+    lmin = max(abs(s), abs(m))
+    neig = l - lmin + 1 # number of eigenvalues
+
+    la_s, v_s = SH.eig_vals_vecs(nl, neig, s, m, a * om_np1)
+    la_r, v_r, rvals = RD.eig_vals_vecs_c(nr, s, m, a, om_np1)
+
+    return om_np1, la_r, v_s[:, l-lmin+1], v_r, rvals
 end
 
 end # module

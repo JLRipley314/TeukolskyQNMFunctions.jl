@@ -17,15 +17,15 @@ const myC = ComplexF64
 #------------------------------------
 
 function tomyI(v)::myI
-   return convert(myI,parse(myF,"$v"))
+    return convert(myI, parse(myF, "$v"))
 end
 
 function tomyF(v)::myF
-   return parse(myF,"$v")
+    return parse(myF, "$v")
 end
 
 function tomyC(v)::myC
-   return parse(myC,"$v")
+    return parse(myC, "$v")
 end
 
 end
