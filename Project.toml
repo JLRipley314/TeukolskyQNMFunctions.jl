@@ -4,7 +4,6 @@ authors = ["Justin L. Ripley"]
 version = "0.1.0"
 
 [deps]
-ApproxFun = "28f2ccd6-bb30-5033-b560-165f7b14dc2f"
 FastGaussQuadrature = "442a2c76-b920-505d-bb47-c5924d526838"
 GenericSchur = "c145ed77-6b09-5dd9-b285-bf645a82121e"
 Jacobi = "83f21c0b-4282-5fbc-9e3f-f6da3d2e584c"
@@ -13,7 +12,6 @@ Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 
 [compat]
-ApproxFun = "0.13"
 FastGaussQuadrature = "0.4"
 GenericSchur = "0.5"
 Jacobi = "0.4,0.5"
