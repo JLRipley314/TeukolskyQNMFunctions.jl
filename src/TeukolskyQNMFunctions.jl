@@ -67,16 +67,16 @@ Search for quasinormal mode frequency in the complex plane using Newton's method
 
 * `nr`       : number of radial Chebyshev collocation points
 * `nl`       : number of spherical harmonic terms
-* `s`        :  spin of the field in the Teukolsky equation
-* `l`        :  l angular number
-* `m`        :  m angular number
-* `a`        :  black hole spin
+* `s`        : spin of the field in the Teukolsky equation
+* `l`        : l angular number
+* `m`        : m angular number
+* `a`        : black hole spin
 * `om`       : guess for the initial quasinormal mode
-* `tolerance`:
-* `epsilon`  :
-* `gamma`    :
-* `verbose`  :
-* `T`        :
+* `tolerance`: tolerance for root finder
+* `epsilon`  : derivative finite difference length
+* `gamma`    : search gamma
+* `verbose`  : true: print out intermediate results as searches for root 
+* `T`        : Type (precision) of computation: Float64, BigFloat, etc
 
 """
 function compute_om(
