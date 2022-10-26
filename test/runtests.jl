@@ -61,6 +61,7 @@ TestCHLaplacian.interval_laplacian_fd(nx,neig,xmin,xmax)
 ##--------------------------------------------------------------
 ## Testing spherical function 
 ##--------------------------------------------------------------
+#=
 TestSphere.test_swal_inner_product(48,-2,-2)
 TestSphere.test_swal_inner_product(48,-1,-2)
 TestSphere.test_swal_inner_product(48, 0,-2)
@@ -97,6 +98,7 @@ TestSphere.test_norm_swal_lap(48,-1,5,23)
 TestSphere.test_norm_swal_lap(48, 0,5,23)
 TestSphere.test_norm_swal_lap(48, 1,5,23)
 TestSphere.test_norm_swal_lap(48, 2,5,23)
+=#
 ##--------------------------------------------------------------
 ## Testing spheroidal functions 
 ##--------------------------------------------------------------

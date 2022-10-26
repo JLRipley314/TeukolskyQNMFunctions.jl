@@ -9,36 +9,24 @@ module TeukolskyQNMFunctions
 
 export F, compute_om
 
-include("CustomTypes.jl")
 include("Spheroidal.jl")
 include("RadialODE.jl")
 
-using .CustomTypes
-
 import .Spheroidal as SH
-import .RadialODE as RD
+import .RadialODE  as RD
 
 """
-    F(
-      nr::myI,
-      nl::myI,
-      s::myI,
-      l::myI,
-      m::myI,
-      a::myF,
-      om::myC
-    )::myF
+    F(nr::Integer, nl::Integer, s::Integer, l::Integer, m::Integer, a::Real, om::Complex, T::Type{<:Real}=Float64)
 
-Absolute difference of Lambda seperation constant
-for radial and angular ODEs.
+Compute the absolute difference of Lambda seperation constant for radial and angular ODEs.
 """
-function F(nr::myI, nl::myI, s::myI, l::myI, m::myI, a::myF, om::myC)::myF
+function F(nr::Integer, nl::Integer, s::Integer, l::Integer, m::Integer, a::Real, om::Complex, T::Type{<:Real}=Float64)
 
     lmin = max(abs(s), abs(m))
     neig = l - lmin + 1 # number of eigenvalues
 
-    la_s, _ = SH.eig_vals_vecs(nl, neig, s, m, a * om)
-    la_r, _ = RD.eig_vals_vecs_c(nr, s, m, a, om)
+    la_s, _ = SH.eig_vals_vecs(nl, neig, s, m, a * om, T)
+    la_r, _, _ = RD.eig_vals_vecs_c(nr, s, m, a, om, T)
 
     ## The Lambdas are ordered in size of smallest magnitude
     ## to largest magnitude, we ASSUME this is the same as the
@@ -50,55 +38,57 @@ end
 
 """
     compute_om(
-      nr::myI,
-      nl::myI,
-      s::myI,
-      l::myI,
-      m::myI,
-      a::myF,
-      om::myC; 
-      tolerance::myF=tomyF(1e-6),
-      epsilon::myF=tomyF(1e-6),
-      gamma::myF=tomyF(1),
-      verbose::Bool=false
-   )::Tuple{
-            myC,
-            myC,
-            Vector{myC},
-            Vector{myC},
-            Vector{myF}}
+        nr::Integer,
+        nl::Integer,
+        s::Integer,
+        l::Integer,
+        m::Integer,
+        a::Real,
+        om::Complex;
+        tolerance::Real = 1e6,
+        epsilon::Real = 1e-6,
+        gamma::Real = 1.0,
+        verbose::Bool = false,
+        T::Type{<:Real}=Float64
+    )
 
-Search for quasinormal mode frequency in the complex plane
-using Newton's method.
+Search for quasinormal mode frequency in the complex plane using Newton's method.
 
 # Arguments
 
-* `nr`: number of radial Chebyshev collocation points
-* `nl`: number of spherical harmonic terms
-* `s`:  spin of the field in the Teukolsky equation
-* `l`:  l angular number
-* `m`:  m angular number
-* `a`:  black hole spin
-* `om`: guess for the initial quasinormal mode
+* `nr`       : number of radial Chebyshev collocation points
+* `nl`       : number of spherical harmonic terms
+* `s`        :  spin of the field in the Teukolsky equation
+* `l`        :  l angular number
+* `m`        :  m angular number
+* `a`        :  black hole spin
+* `om`       : guess for the initial quasinormal mode
+* `tolerance`:
+* `epsilon`  :
+* `gamma`    :
+* `verbose`  :
+* `T`        :
+
 """
 function compute_om(
-    nr::myI,
-    nl::myI,
-    s::myI,
-    l::myI,
-    m::myI,
-    a::myF,
-    om::myC;
-    tolerance::myF = tomyF(1e-6),
-    epsilon::myF = tomyF(1e-6),
-    gamma::myF = tomyF(1),
+    nr::Integer,
+    nl::Integer,
+    s::Integer,
+    l::Integer,
+    m::Integer,
+    a::Real,
+    om::Complex;
+    tolerance::Real = 1e6,
+    epsilon::Real = 1e-6,
+    gamma::Real = 1.0,
     verbose::Bool = false,
+    T::Type{<:Real}=Float64
 )
 
-    om_n = tomyC(-1000)
+    om_n = -1000.0 + 0.0im
     om_np1 = om
 
-    f(omega) = F(nr, nl, s, l, m, a, omega)
+    f(omega) = F(nr, nl, s, l, m, a, omega, T)
 
     ## Newton search with 2nd order finite differences
 
@@ -109,14 +99,14 @@ function compute_om(
         ## if too many iterations, reduce search step size
         iterations += 1
         if iterations % 100 == 0
-            newgamma /= tomyF(2)
+            newgamma /= T(2)
         end
 
         om_n = om_np1
 
         df = (
-            (f(om_n + epsilon) - f(om_n - epsilon)) / (tomyF(2) * epsilon) +
-            (f(om_n + im * epsilon) - f(om_n - im * epsilon)) / (tomyF(2) * im * epsilon)
+            (f(om_n + epsilon) - f(om_n - epsilon)) / (T(2) * epsilon) +
+            (f(om_n + im * epsilon) - f(om_n - im * epsilon)) / (T(2) * im * epsilon)
         )
         om_np1 = om_n - newgamma * f(om_n) / df
 
@@ -128,8 +118,8 @@ function compute_om(
     lmin = max(abs(s), abs(m))
     neig = l - lmin + 1 # number of eigenvalues
 
-    la_s, v_s = SH.eig_vals_vecs(nl, neig, s, m, a * om_np1)
-    la_r, v_r, rvals = RD.eig_vals_vecs_c(nr, s, m, a, om_np1)
+    la_s, v_s = SH.eig_vals_vecs(nl, neig, s, m, a * om_np1, T)
+    la_r, v_r, rvals = RD.eig_vals_vecs_c(nr, s, m, a, om_np1, T)
 
     return om_np1, la_r, v_s[:, l-lmin+1], v_r, rvals
 end
