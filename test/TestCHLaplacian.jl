@@ -52,7 +52,7 @@ function interval_laplacian_fd(nx::myI, neig::myI, xmin::myF, xmax::myF)
     D2[end, end] = 1.0
     D2[nx, 1:end-1] .= 0.0
 
-    t = eigvals(D2, sortby = abs)
+    t = eigvals(Matrix(D2), sortby = abs)
 
     L = xmax - xmin
 
