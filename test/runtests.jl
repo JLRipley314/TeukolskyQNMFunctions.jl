@@ -1,6 +1,5 @@
 using Test 
 
-include("../src/CustomTypes.jl")
 include("../src/Spheroidal.jl")
 include("../src/TeukolskyQNMFunctions.jl")
 
@@ -10,7 +9,7 @@ include("TestRadialODE.jl")
 include("TestSphere.jl")
 include("TestSpheroidal.jl")
 
-using .CustomTypes, ..TeukolskyQNMFunctions
+using ..TeukolskyQNMFunctions
 
 import .TestCHLaplacian 
 import .TestChebyshev 
@@ -21,6 +20,10 @@ import .TestSpheroidal
 import .Spheroidal: compute_l_min, eig_vals_vecs
 
 avals = [0.0, 0.354, 0.7, 0.99] ## same as in generate.py
+
+tomyI(x) = convert(Int64,x)
+tomyF(x) = convert(Float64,x)
+tomyC(x) = convert(Complex{Float64},x)
 
 ###--------------------------------------------------------------
 ## Test convergence of Chebyshev derivatives 
@@ -56,12 +59,9 @@ xmax = tomyF(1.0)
 TestCHLaplacian.interval_laplacian_ch(nx,neig,xmin,xmax)
 nx = tomyI(320) 
 TestCHLaplacian.interval_laplacian_fd(nx,neig,xmin,xmax)
-#nx  = tomyI(40)
-#TestCHLaplacian.interval_laplacian_chs(nx,neig,xmin,xmax)
 ##--------------------------------------------------------------
 ## Testing spherical function 
 ##--------------------------------------------------------------
-#=
 TestSphere.test_swal_inner_product(48,-2,-2)
 TestSphere.test_swal_inner_product(48,-1,-2)
 TestSphere.test_swal_inner_product(48, 0,-2)
@@ -98,7 +98,6 @@ TestSphere.test_norm_swal_lap(48,-1,5,23)
 TestSphere.test_norm_swal_lap(48, 0,5,23)
 TestSphere.test_norm_swal_lap(48, 1,5,23)
 TestSphere.test_norm_swal_lap(48, 2,5,23)
-=#
 ##--------------------------------------------------------------
 ## Testing spheroidal functions 
 ##--------------------------------------------------------------

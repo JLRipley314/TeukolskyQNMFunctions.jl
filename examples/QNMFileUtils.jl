@@ -1,8 +1,6 @@
 module QNMFileUtils 
 
-include("../src/CustomTypes.jl")
 include("../src/Chebyshev.jl")
-using  .CustomTypes 
 import .Chebyshev as CH
 import TeukolskyQNMFunctions as QNM
 
@@ -13,20 +11,20 @@ export generate_data
 
 function save_to_file!(
       fname::String,
-      nr::myI,
-      nl::myI, 
-      s::myI,
-      n::myI,
-      l::myI,
-      m::myI,
-      a::myF,
-      omega::myC,
-      lambda::myC,
-      vs::Vector{myC},
-      vr::Vector{myC},
-      vrc::Vector{myC},
-      rs::Vector{myF},
-      tolerance::myF
+      nr::Integer,
+      nl::Integer, 
+      s::Integer,
+      n::Integer,
+      l::Integer,
+      m::Integer,
+      a::Real,
+      omega::Complex,
+      lambda::Complex,
+      vs::Vector{<:Complex},
+      vr::Vector{<:Complex},
+      vrc::Vector{<:Complex},
+      rs::Vector{<:Real},
+      tolerance::Real
    )
    HDF5.h5open("$fname.h5", "cw") do file
       g = HDF5.create_group(file, 
@@ -57,16 +55,16 @@ end
 """
 function generate_data(
       fname::String,
-      nr::myI,
-      nl::myI, 
-      s::myI,
-      n::myI,
-      l::myI,
-      m::myI,
-      avals::Vector{myF};
-      qnm_tolerance::myF=tomyF(1e-6),
-      coef_tolerance::myF=tomyF(1e-6),
-      epsilon::myF=tomyF(1e-6)
+      nr::Integer,
+      nl::Integer, 
+      s::Integer,
+      n::Integer,
+      l::Integer,
+      m::Integer,
+      avals::Vector{<:Real};
+      qnm_tolerance::Real=1e-6,
+      coef_tolerance::Real=1e-6,
+      epsilon::Real=1e-6
    )
    qnmlib = PyCall.pyimport("qnm")
 
@@ -83,10 +81,10 @@ function generate_data(
                  )
          om, la, cs = lib(a=convert(Float64,min(a,0.9999999)))
          omega, lambda, vs, vr, rs = QNM.compute_om(
-            nrtmp, nltmp, s, l, m, a, tomyC(om),
-            tolerance=tomyF(qnm_tolerance),
-            epsilon=tomyF(epsilon),
-            gamma=tomyF(1.0-a)
+            nrtmp, nltmp, s, l, m, a, om,
+            tolerance=qnm_tolerance,
+            epsilon=epsilon,
+            gamma=1.0-a
          )
          chebcoef = CH.to_cheb(vr)
          if ((abs(chebcoef[end]) < coef_tolerance) 
@@ -104,10 +102,10 @@ function generate_data(
             break 
          end
          if (abs(chebcoef[end]) > coef_tolerance) 
-            nrtmp += tomyI(ceil(nrtmp/2))
+            nrtmp += Int64(ceil(nrtmp/2))
          end
          if (abs(vs[end]) > coef_tolerance) 
-            nltmp += tomyI(ceil(nltmp/2))
+            nltmp += Int64(ceil(nltmp/2))
          end
       end
    end

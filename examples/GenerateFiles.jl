@@ -1,24 +1,22 @@
 module GenerateFiles
 
-include("../src/CustomTypes.jl")
 include("QNMFileUtils.jl")
-using  .CustomTypes
 import .QNMFileUtils as QF 
 
 export generate
 
 function generate(
       prename::String,
-      nr::myI,
-      nl::myI,
-      s::myI,
-      m::myI,
-      l::myI,
-      n::myI,
-      avals::Vector{myF},
-      qnm_tolerance::myF,
-      coef_tolerance::myF,
-      epsilon::myF)
+      nr::Integer,
+      nl::Integer,
+      s::Integer,
+      m::Integer,
+      l::Integer,
+      n::Integer,
+      avals::Vector{<:Real},
+      qnm_tolerance::Real,
+      coef_tolerance::Real,
+      epsilon::Real)
    #println("bash -c 'rm -f $(pwd)/HigherPrecData/*.h5'")
    #run(`bash -c 'rm -f $(pwd)/HigherPrecData/*.h5'`)
 
@@ -28,12 +26,11 @@ function generate(
          println("s=$s,m=$m,n=$n,l=$l")
             QF.generate_data(
                "$(pwd())/qnmfiles/$(prename)s$(s)_m$(m)_n$(n)",
-               tomyI(nr), tomyI(nl), 
-               tomyI(s), tomyI(n), tomyI(l), tomyI(m),
-               [tomyF(a) for a in avals],
-               qnm_tolerance=tomyF(qnm_tolerance),
-               coef_tolerance=tomyF(coef_tolerance),
-               epsilon=tomyF(epsilon)
+               nr, nl, s, n, l, m,
+               [a for a in avals],
+               qnm_tolerance=qnm_tolerance,
+               coef_tolerance=coef_tolerance,
+               epsilon=epsilon
             )
       catch err
          println(err)

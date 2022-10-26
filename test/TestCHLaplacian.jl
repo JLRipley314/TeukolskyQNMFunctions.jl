@@ -5,8 +5,6 @@ export interval_laplacian_ch, interval_laplacian_fd, interval_laplacian_chs
 const tolerance = 1e-6 ## tolerance we compare to
 
 include("../src/Chebyshev.jl")
-include("../src/CustomTypes.jl")
-using .CustomTypes
 import .Chebyshev as CH
 
 using LinearAlgebra: I, eigvals
@@ -16,11 +14,13 @@ import Test: @test
 
 ##============================================================
 """
+    interval_laplacian_ch(nx::Integer, neig::Integer, xmin::Real, xmax::Real, T::Type{<:Real}=Float64)
+
 Compare Eigenvalues on an interval using D2 
 """
-function interval_laplacian_ch(nx::myI, neig::myI, xmin::myF, xmax::myF)
+function interval_laplacian_ch(nx::Integer, neig::Integer, xmin::Real, xmax::Real, T::Type{<:Real}=Float64)
 
-    D1 = CH.mat_D1(xmin, xmax, nx)
+    D1 = CH.mat_D1(xmin, xmax, nx, T)
     D2 = -D1 * D1
 
     D2[1, 1] = 1.0
@@ -40,11 +40,13 @@ function interval_laplacian_ch(nx::myI, neig::myI, xmin::myF, xmax::myF)
 end
 
 """
+    interval_laplacian_fd(nx::Integer, neig::Integer, xmin::Real, xmax::Real, T::Type{<:Real}=Float64)
+
 Compare Eigenvalues on an interval using finite difference D2 
 """
-function interval_laplacian_fd(nx::myI, neig::myI, xmin::myF, xmax::myF)
+function interval_laplacian_fd(nx::Integer, neig::Integer, xmin::Real, xmax::Real, T::Type{<:Real}=Float64)
 
-    D2 = -CH.mat_fd_D2(xmin, xmax, nx)
+    D2 = -CH.mat_fd_D2(xmin, xmax, nx, T)
 
     D2[1, 1] = 1.0
     D2[1, 2:end] .= 0.0

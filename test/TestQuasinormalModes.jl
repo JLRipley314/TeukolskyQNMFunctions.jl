@@ -1,8 +1,5 @@
 module TestQuasinormalModes
 
-include("../src/CustomTypes.jl")
-using CustomTypes
-
 const tolerance = 1e-4 ## tolerance we compare to
 
 ##============================================================
@@ -23,13 +20,13 @@ for s=[-2,-1,0]
                println("s=$s, (n=$n,l=$l,m=$m), a=$a, ω=$om, Λ=$la")
                   
                f_om, f_la, f_vs, f_vr, rvals = QNM.compute_om(
-                                         myI(nr), 
-                                         myI(nl), 
-                                         myI(s), 
-                                         myI(l), 
-                                         myI(m), 
-                                         myF(a), 
-                                         myC(om+0.1*rand(myC)),
+                                         nr, 
+                                         nl, 
+                                         s, 
+                                         l, 
+                                         m, 
+                                         a, 
+                                         om+0.1*rand(ComplexF64),
                                          verbose=false
                                         )
                @test abs(f_om-om)/max(1,abs(om)) < tolerance

@@ -3,9 +3,7 @@ module TestChebyshev
 export test_convergence,
     test_convergence_fd, test_X_matrices, test_to_cheb, test_to_cheb_to_real
 
-include("../src/CustomTypes.jl")
 include("../src/Chebyshev.jl")
-using .CustomTypes
 
 import Test: @test
 
@@ -27,19 +25,30 @@ function one_norm(v)
 end
 
 """
+    evaluate_difference(
+        nx::Integer,
+        xmin::Real,
+        xmax::Real,
+        f::Function,
+        d1f::Function,
+        d2f::Function,
+        T::Type{<:Real}=Float64
+    )
+
 Evaluate derivative compared to analytic value.
 """
 function evaluate_difference(
-    nx::myI,
-    xmin::myF,
-    xmax::myF,
+    nx::Integer,
+    xmin::Real,
+    xmax::Real,
     f::Function,
     d1f::Function,
     d2f::Function,
+    T::Type{<:Real}=Float64
 )
-    xvals = CH.cheb_pts(xmin, xmax, nx)
+    xvals = CH.cheb_pts(xmin, xmax, nx, T)
 
-    D1 = CH.mat_D1(xmin, xmax, nx)
+    D1 = CH.mat_D1(xmin, xmax, nx, T)
     D2 = D1 * D1
 
     fv = [f(x) for x in xvals]
@@ -56,20 +65,31 @@ function evaluate_difference(
 end
 
 """
+    evaluate_difference_fd(
+        nx::Integer,
+        xmin::Real,
+        xmax::Real,
+        f::Function,
+        d1f::Function,
+        d2f::Function,
+        T::Type{<:Real}=Float64
+    )
+
 Evaluate finite difference derivative compared to analytic value.
 """
 function evaluate_difference_fd(
-    nx::myI,
-    xmin::myF,
-    xmax::myF,
+    nx::Integer,
+    xmin::Real,
+    xmax::Real,
     f::Function,
     d1f::Function,
     d2f::Function,
+    T::Type{<:Real}=Float64
 )
-    xvals = CH.cheb_pts(xmin, xmax, nx)
+    xvals = CH.cheb_pts(xmin, xmax, nx, T)
 
-    D1 = CH.mat_fd_D1(xmin, xmax, nx)
-    D2 = CH.mat_fd_D2(xmin, xmax, nx)
+    D1 = CH.mat_fd_D1(xmin, xmax, nx, T)
+    D2 = CH.mat_fd_D2(xmin, xmax, nx, T)
 
     fv = [f(x) for x in xvals]
     d1fv = [d1f(x) for x in xvals]
@@ -85,20 +105,31 @@ function evaluate_difference_fd(
 end
 
 """
+    test_convergence(
+        nx::Integer,
+        xmin::Real,
+        xmax::Real,
+        f::Function,
+        d1f::Function,
+        d2f::Function,
+        T::Type{<:Real}=Float64
+    )
+
 Evaluate convergence of the derivative matrices.
 """
 function test_convergence(
-    nx::myI,
-    xmin::myF,
-    xmax::myF,
+    nx::Integer,
+    xmin::Real,
+    xmax::Real,
     f::Function,
     d1f::Function,
     d2f::Function,
+    T::Type{<:Real}=Float64
 )
-
-    norm_d1_1, norm_d2_1 = evaluate_difference(nx, xmin, xmax, f, d1f, d2f)
+    
+    norm_d1_1, norm_d2_1 = evaluate_difference(nx, xmin, xmax, f, d1f, d2f, T)
     norm_d1_2, norm_d2_2 =
-        evaluate_difference(convert(myI, ceil(1.1 * nx)), xmin, xmax, f, d1f, d2f)
+        evaluate_difference(convert(Int64, ceil(1.1 * nx)), xmin, xmax, f, d1f, d2f, T)
 
     @test norm_d1_1 / norm_d1_2 > 5.0
     @test norm_d2_1 / norm_d2_2 > 5.0
@@ -107,20 +138,31 @@ function test_convergence(
 end
 
 """
+    test_convergence_fd(
+        nx::Integer,
+        xmin::Real,
+        xmax::Real,
+        f::Function,
+        d1f::Function,
+        d2f::Function,
+        T::Type{<:Real}=Float64
+    )
+
 Evaluate convergence of the finite difference derivative matrices.
 """
 function test_convergence_fd(
-    nx::myI,
-    xmin::myF,
-    xmax::myF,
+    nx::Integer,
+    xmin::Real,
+    xmax::Real,
     f::Function,
     d1f::Function,
     d2f::Function,
+    T::Type{<:Real}=Float64
 )
 
-    norm_d1_1, norm_d2_1 = evaluate_difference_fd(nx, xmin, xmax, f, d1f, d2f)
+    norm_d1_1, norm_d2_1 = evaluate_difference_fd(nx, xmin, xmax, f, d1f, d2f, T)
     norm_d1_2, norm_d2_2 =
-        evaluate_difference_fd(convert(myI, ceil(2 * nx)), xmin, xmax, f, d1f, d2f)
+        evaluate_difference_fd(convert(Int64, ceil(2 * nx)), xmin, xmax, f, d1f, d2f, T)
 
     @test norm_d1_1 / norm_d1_2 > 3.5
     @test norm_d2_1 / norm_d2_2 > 3.5
@@ -129,17 +171,19 @@ function test_convergence_fd(
 end
 
 """
+    test_X_matrices(nx::Integer, xmin::Real, xmax::Real, T::Type{<:Real}=Float64)
+
 Evaluate derivative on the X matrices
 """
-function test_X_matrices(nx::myI, xmin::myF, xmax::myF)
+function test_X_matrices(nx::Integer, xmin::Real, xmax::Real, T::Type{<:Real}=Float64)
 
-    i_1 = ones(myF, nx)
-    D_1 = CH.mat_D1(xmin, xmax, nx)
-    X_1 = CH.mat_X(xmin, xmax, nx)
+    i_1 = ones(T, nx)
+    D_1 = CH.mat_D1(xmin, xmax, nx, T)
+    X_1 = CH.mat_X(xmin, xmax, nx, T)
 
-    i_2 = ones(myF, convert(myI, ceil(1.1 * nx)))
-    D_2 = CH.mat_D1(xmin, xmax, convert(myI, ceil(1.1 * nx)))
-    X_2 = CH.mat_X(xmin, xmax, convert(myI, ceil(1.1 * nx)))
+    i_2 = ones(T, convert(Int64, ceil(1.1 * nx)))
+    D_2 = CH.mat_D1(xmin, xmax, convert(Int64, ceil(1.1 * nx)))
+    X_2 = CH.mat_X(xmin, xmax, convert(Int64, ceil(1.1 * nx)))
 
     norm_1 = one_norm(D_1 * sin.(X_1 * i_1) .- cos.(X_1 * i_1))
     norm_2 = one_norm(D_2 * sin.(X_2 * i_2) .- cos.(X_2 * i_2))
@@ -150,16 +194,18 @@ function test_X_matrices(nx::myI, xmin::myF, xmax::myF)
 end
 
 """
+    test_to_cheb(nx::Integer, T::Type{<:Real}=Float64)
+
 Test can recover Chebyshev coefficients from real space data. 
 """
-function test_to_cheb(nx::myI)
+function test_to_cheb(nx::Integer, T::Type{<:Real}=Float64)
 
-    i_1 = ones(myF, nx)
-    X_1 = CH.mat_X(tomyF(-1.0), tomyF(1.0), nx)
+    i_1 = ones(T, nx)
+    X_1 = CH.mat_X(-1.0, 1.0, nx, T)
 
     for n = 0:(nx-5)
         values = cos.(n * acos.(X_1 * i_1)) ## nth Chebyshev polynomial
-        c_1 = CH.to_cheb(values) ## coefficients, only nth should be nonzero
+        c_1 = CH.to_cheb(values, T) ## coefficients, only nth should be nonzero
         for i = 1:nx
             if i == n + 1
                 @test abs(c_1[i] - 1.0) < 1e-14
@@ -172,27 +218,29 @@ function test_to_cheb(nx::myI)
 end
 
 """
+    test_to_cheb_to_real(nx::Integer, xmin::Real, xmax::Real, T::Type{<:Real}=Float64)
+
 Test can go to and from Chebyshev space correctly. 
 """
-function test_to_cheb_to_real(nx::myI, xmin::myF, xmax::myF)
+function test_to_cheb_to_real(nx::Integer, xmin::Real, xmax::Real, T::Type{<:Real}=Float64)
 
     nx_1 = nx
-    nx_2 = convert(myI, ceil(1.1 * nx))
+    nx_2 = convert(Int64, ceil(1.1 * nx))
 
-    i_1 = ones(myF, nx_1)
-    X_1 = CH.mat_X(xmin, xmax, nx_1)
+    i_1 = ones(T, nx_1)
+    X_1 = CH.mat_X(xmin, xmax, nx_1, T)
     xv = X_1 * i_1
     values = tanh.(xv)
-    c_1 = CH.to_cheb(values)
-    r_1 = CH.to_real(c_1)
+    c_1 = CH.to_cheb(values, T)
+    r_1 = CH.to_real(c_1, T)
     n_1 = one_norm(values .- r_1)
 
-    i_2 = ones(myF, nx_2)
-    X_2 = CH.mat_X(xmin, xmax, nx_2)
+    i_2 = ones(T, nx_2)
+    X_2 = CH.mat_X(xmin, xmax, nx_2, T)
     xv = X_2 * i_2
     values = tanh.(xv)
-    c_2 = CH.to_cheb(values)
-    r_2 = CH.to_real(c_2)
+    c_2 = CH.to_cheb(values, T)
+    r_2 = CH.to_real(c_2, T)
 
     n_2 = one_norm(values .- r_2)
 

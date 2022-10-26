@@ -10,18 +10,18 @@ const tol = 5e-13
 export test_swal_inner_product, test_norm_swal_lap, test_norm_filter
 
 """
-Computes inner product between different Y^s_{lm}
+    test_swal_inner_product(
+       ny::Integer,
+       spin::Integer,
+       m_ang::Integer
+       )::Nothing
 
-test_swal_inner_product(
-   ny::Int64,
-   spin::Int64,
-   m_ang::Int64
-   )::Nothing
+Computes inner product between different Y^s_{lm}
 """
 function test_swal_inner_product(
-      ny::Int64,
-      spin::Int64,
-      m_ang::Int64
+      ny::Integer,
+      spin::Integer,
+      m_ang::Integer
    )::Nothing
 
    nl = Sphere.num_l(ny)
@@ -43,30 +43,32 @@ function test_swal_inner_product(
 end
 
 """
+    test_norm_swal_lap(
+       ny::Integer,
+       spin::Integer,
+       m_ang::Integer,
+       l_ang::Integer,
+       T::Type{<:Real}=Float64
+       )::Nothing
+
 Computes the norm of the difference between the numerical and
 exact spin-weighted spherical laplacian for a given
 spin-weighted spherical harmonic.
-
-test_norm_swal_lap(
-   ny::Int64,
-   spin::Int64,
-   m_ang::Int64,
-   l_ang::Int64
-   )::Nothing
 """
 function test_norm_swal_lap(
-      ny::Int64,
-      spin::Int64,
-      m_ang::Int64,
-      l_ang::Int64
+      ny::Integer,
+      spin::Integer,
+      m_ang::Integer,
+      l_ang::Integer,
+      T::Type{<:Real}=Float64
    )::Nothing
    
    Yv = Sphere.Y_vals(ny)
 
    swal = [Sphere.swal(spin,m_ang,l_ang,y) for y in Yv]
 
-   swal_lap_v1 = [-(l_ang-spin)*(l_ang+spin+1.0)*v for v in swal]
-   swal_lap_v2 = zeros(Float64,ny) 
+   swal_lap_v1 = [-(l_ang-spin)*(l_ang+spin+1)*T(v) for v in swal]
+   swal_lap_v2 = zeros(T,ny) 
    
    lap = Sphere.swal_laplacian_matrix(ny,spin,m_ang)
    for j=1:ny
@@ -85,14 +87,23 @@ function test_norm_swal_lap(
 end
 
 """
+    test_norm_filter(
+          ny::Integer,
+          spin::Integer,
+          m_ang::Integer,
+          l_ang::Integer,
+          T::Type{<:Real}=Float64
+       )::Nothing
+
 Test that the swal filter matrix acts as a low pass filter
 for angular perturbations.
 """
 function test_norm_filter(
-      ny::Int64,
-      spin::Int64,
-      m_ang::Int64,
-      l_ang::Int64
+      ny::Integer,
+      spin::Integer,
+      m_ang::Integer,
+      l_ang::Integer,
+      T::Type{<:Real}=Float64
    )::Nothing
    
    Yv = Sphere.Y_vals(ny)
@@ -100,7 +111,7 @@ function test_norm_filter(
    ## essentially random points multiplied by spherical harmonic;
    ## with the filter the norm should go to zero
    v1 = [0.1*(rand()-0.5)*Sphere.swal(spin,m_ang,l_ang,y) for y in Yv]
-   v2 = zeros(Float64,ny) 
+   v2 = zeros(T,ny) 
   
    filter = Sphere.swal_filter_matrix(ny,spin,m_ang)
 
