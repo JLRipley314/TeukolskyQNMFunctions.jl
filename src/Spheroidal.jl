@@ -26,8 +26,10 @@ arXiv:2202.03837
 """
 @inline function compute_A(s::Integer, l::Integer, m::Integer)
     return sqrt(
-        (l + 1 - s) * (l + 1 + s) * (l + 1 + m) * (l + 1 - m) //
-        (((l + 1)^2) * (2 * l + 1) * (2 * l + 3)),
+        (l + 1 - s) *
+        (l + 1 + s) *
+        (l + 1 + m) *
+        (l + 1 - m) // (((l + 1)^2) * (2 * l + 1) * (2 * l + 3)),
     )
 end
 """
@@ -39,7 +41,7 @@ arXiv:2202.03837
 """
 @inline function compute_B(s::Integer, l::Integer, m::Integer)
     if (l == 0)
-        return 0 
+        return 0
     else
         return -(m * s) // (l * (l + 1))
     end
@@ -53,11 +55,10 @@ arXiv:2202.03837
 """
 @inline function compute_C(s::Integer, l::Integer, m::Integer)
     if (l == 0)
-        return 0 
+        return 0
     else
         return sqrt(
-            (l - s) * (l + s) * (l + m) * (l - m) //
-            ((l^2) * (2 * l + 1) * (2 * l - 1)),
+            (l - s) * (l + s) * (l + m) * (l - m) // ((l^2) * (2 * l + 1) * (2 * l - 1)),
         )
     end
 end
@@ -66,7 +67,7 @@ end
 
 Compute the matrix for y in spectral space.
 """
-function mat_Y(nl::Integer, s::Integer, m::Integer, T::Type{<:Real}=Float64)
+function mat_Y(nl::Integer, s::Integer, m::Integer, T::Type{<:Real} = Float64)
 
     I = Vector{typeof(nl)}(undef, 0)
     J = Vector{typeof(nl)}(undef, 0)
@@ -104,7 +105,7 @@ end
 
 Compute the matrix for spherical laplacian (s=0) in spectral space.
 """
-function mat_L(nl::Integer, s::Integer, m::Integer, T::Type{<:Real}=Float64)
+function mat_L(nl::Integer, s::Integer, m::Integer, T::Type{<:Real} = Float64)
 
     I = Vector{typeof(nl)}(undef, 0)
     J = Vector{typeof(nl)}(undef, 0)
@@ -128,7 +129,13 @@ end
 
 Compute the matrix for computing spheroidal-spherical mixing and seperation coefficients.
 """
-function compute_M_matrix(nl::Integer, s::Integer, m::Integer, c::Complex, T::Type{<:Real}=Float64)
+function compute_M_matrix(
+    nl::Integer,
+    s::Integer,
+    m::Integer,
+    c::Complex,
+    T::Type{<:Real} = Float64,
+)
     Y1 = mat_Y(nl + 2, s, m, T) # look at larger to capture last term in matrix mult
     # at higher l
     Y2 = Y1 * Y1
@@ -148,7 +155,14 @@ Returns eigenvalues λs (smallest to largest), and eigenvectors as
 an array (access nth eigenvector through v[:,n]); i.e. returns
 (λs, vs)
 """
-function eig_vals_vecs(nl::Integer, neig::Integer, s::Integer, m::Integer, c::Complex, T::Type{<:Real}=Float64)
+function eig_vals_vecs(
+    nl::Integer,
+    neig::Integer,
+    s::Integer,
+    m::Integer,
+    c::Complex,
+    T::Type{<:Real} = Float64,
+)
 
     Mat = compute_M_matrix(nl, s, m, c, T)
 

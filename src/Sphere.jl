@@ -28,7 +28,7 @@ Number of l angular values given ny theta values
 num_l = ny - 2*(max_s+max_m), where max_s and max_m
 are hard coded in Sphere.jl
 """
-function num_l(ny::Integer, max_s::Integer=2, max_m::Integer=6)
+function num_l(ny::Integer, max_s::Integer = 2, max_m::Integer = 6)
     @assert ny > (2 * max_s + 2 * max_m) + 4
     return ny - 2 * max_s - 2 * max_m
 end

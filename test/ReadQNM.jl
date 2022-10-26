@@ -11,7 +11,14 @@ end
 
 Returns omega, lambda
 """
-function qnm(n::Integer, s::Integer, m::Integer, l::Integer, a::Real, T::Type{<:Real}=Float64)
+function qnm(
+    n::Integer,
+    s::Integer,
+    m::Integer,
+    l::Integer,
+    a::Real,
+    T::Type{<:Real} = Float64,
+)
 
     for line in eachline("qnmvals.txt")
         line = split(line, ",")

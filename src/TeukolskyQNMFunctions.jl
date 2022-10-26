@@ -13,14 +13,23 @@ include("Spheroidal.jl")
 include("RadialODE.jl")
 
 import .Spheroidal as SH
-import .RadialODE  as RD
+import .RadialODE as RD
 
 """
     F(nr::Integer, nl::Integer, s::Integer, l::Integer, m::Integer, a::Real, om::Complex, T::Type{<:Real}=Float64)
 
 Compute the absolute difference of Lambda seperation constant for radial and angular ODEs.
 """
-function F(nr::Integer, nl::Integer, s::Integer, l::Integer, m::Integer, a::Real, om::Complex, T::Type{<:Real}=Float64)
+function F(
+    nr::Integer,
+    nl::Integer,
+    s::Integer,
+    l::Integer,
+    m::Integer,
+    a::Real,
+    om::Complex,
+    T::Type{<:Real} = Float64,
+)
 
     lmin = max(abs(s), abs(m))
     neig = l - lmin + 1 # number of eigenvalues
@@ -82,7 +91,7 @@ function compute_om(
     epsilon::Real = 1e-6,
     gamma::Real = 1.0,
     verbose::Bool = false,
-    T::Type{<:Real}=Float64
+    T::Type{<:Real} = Float64,
 )
 
     om_n = -1000.0 + 0.0im

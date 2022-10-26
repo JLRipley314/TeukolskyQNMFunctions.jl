@@ -18,7 +18,13 @@ import Test: @test
 
 Compare Eigenvalues on an interval using D2 
 """
-function interval_laplacian_ch(nx::Integer, neig::Integer, xmin::Real, xmax::Real, T::Type{<:Real}=Float64)
+function interval_laplacian_ch(
+    nx::Integer,
+    neig::Integer,
+    xmin::Real,
+    xmax::Real,
+    T::Type{<:Real} = Float64,
+)
 
     D1 = CH.mat_D1(xmin, xmax, nx, T)
     D2 = -D1 * D1
@@ -44,7 +50,13 @@ end
 
 Compare Eigenvalues on an interval using finite difference D2 
 """
-function interval_laplacian_fd(nx::Integer, neig::Integer, xmin::Real, xmax::Real, T::Type{<:Real}=Float64)
+function interval_laplacian_fd(
+    nx::Integer,
+    neig::Integer,
+    xmin::Real,
+    xmax::Real,
+    T::Type{<:Real} = Float64,
+)
 
     D2 = -CH.mat_fd_D2(xmin, xmax, nx, T)
 

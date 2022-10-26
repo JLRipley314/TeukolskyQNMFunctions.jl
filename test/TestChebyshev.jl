@@ -44,7 +44,7 @@ function evaluate_difference(
     f::Function,
     d1f::Function,
     d2f::Function,
-    T::Type{<:Real}=Float64
+    T::Type{<:Real} = Float64,
 )
     xvals = CH.cheb_pts(xmin, xmax, nx, T)
 
@@ -84,7 +84,7 @@ function evaluate_difference_fd(
     f::Function,
     d1f::Function,
     d2f::Function,
-    T::Type{<:Real}=Float64
+    T::Type{<:Real} = Float64,
 )
     xvals = CH.cheb_pts(xmin, xmax, nx, T)
 
@@ -124,9 +124,9 @@ function test_convergence(
     f::Function,
     d1f::Function,
     d2f::Function,
-    T::Type{<:Real}=Float64
+    T::Type{<:Real} = Float64,
 )
-    
+
     norm_d1_1, norm_d2_1 = evaluate_difference(nx, xmin, xmax, f, d1f, d2f, T)
     norm_d1_2, norm_d2_2 =
         evaluate_difference(convert(Int64, ceil(1.1 * nx)), xmin, xmax, f, d1f, d2f, T)
@@ -157,7 +157,7 @@ function test_convergence_fd(
     f::Function,
     d1f::Function,
     d2f::Function,
-    T::Type{<:Real}=Float64
+    T::Type{<:Real} = Float64,
 )
 
     norm_d1_1, norm_d2_1 = evaluate_difference_fd(nx, xmin, xmax, f, d1f, d2f, T)
@@ -175,7 +175,7 @@ end
 
 Evaluate derivative on the X matrices
 """
-function test_X_matrices(nx::Integer, xmin::Real, xmax::Real, T::Type{<:Real}=Float64)
+function test_X_matrices(nx::Integer, xmin::Real, xmax::Real, T::Type{<:Real} = Float64)
 
     i_1 = ones(T, nx)
     D_1 = CH.mat_D1(xmin, xmax, nx, T)
@@ -198,7 +198,7 @@ end
 
 Test can recover Chebyshev coefficients from real space data. 
 """
-function test_to_cheb(nx::Integer, T::Type{<:Real}=Float64)
+function test_to_cheb(nx::Integer, T::Type{<:Real} = Float64)
 
     i_1 = ones(T, nx)
     X_1 = CH.mat_X(-1.0, 1.0, nx, T)
@@ -222,7 +222,12 @@ end
 
 Test can go to and from Chebyshev space correctly. 
 """
-function test_to_cheb_to_real(nx::Integer, xmin::Real, xmax::Real, T::Type{<:Real}=Float64)
+function test_to_cheb_to_real(
+    nx::Integer,
+    xmin::Real,
+    xmax::Real,
+    T::Type{<:Real} = Float64,
+)
 
     nx_1 = nx
     nx_2 = convert(Int64, ceil(1.1 * nx))
