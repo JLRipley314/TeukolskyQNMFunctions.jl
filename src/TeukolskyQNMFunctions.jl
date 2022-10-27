@@ -16,26 +16,33 @@ import .Spheroidal as SH
 import .RadialODE as RD
 
 """
-    F(nr::Integer, nl::Integer, s::Integer, l::Integer, m::Integer, a::Real, om::Complex, T::Type{<:Real}=Float64)
+    F(
+            nr::Integer,
+            nl::Integer,
+            s::Integer,
+            l::Integer,
+            m::Integer,
+            a::T,
+            om::Complex{T}
+        ) where T<:Real
 
 Compute the absolute difference of Lambda seperation constant for radial and angular ODEs.
 """
 function F(
-    nr::Integer,
-    nl::Integer,
-    s::Integer,
-    l::Integer,
-    m::Integer,
-    a::Real,
-    om::Complex,
-    T::Type{<:Real} = Float64,
-)
+        nr::Integer,
+        nl::Integer,
+        s::Integer,
+        l::Integer,
+        m::Integer,
+        a::T,
+        om::Complex{T}
+    ) where T<:Real
 
     lmin = max(abs(s), abs(m))
     neig = l - lmin + 1 # number of eigenvalues
 
-    la_s, _ = SH.eig_vals_vecs(nl, neig, s, m, a * om, T)
-    la_r, _, _ = RD.eig_vals_vecs_c(nr, s, m, a, om, T)
+    la_s, _ = SH.eig_vals_vecs(nl, neig, s, m, a * om)
+    la_r, _, _ = RD.eig_vals_vecs_c(nr, s, m, a, om)
 
     ## The Lambdas are ordered in size of smallest magnitude
     ## to largest magnitude, we ASSUME this is the same as the
@@ -57,9 +64,8 @@ end
         tolerance::Real = 1e6,
         epsilon::Real = 1e-6,
         gamma::Real = 1.0,
-        verbose::Bool = false,
-        T::Type{<:Real}=Float64
-    )
+        verbose::Bool = false
+    ) where T<:Real
 
 Search for quasinormal mode frequency in the complex plane using Newton's method.
 
@@ -76,28 +82,28 @@ Search for quasinormal mode frequency in the complex plane using Newton's method
 * `epsilon`  : derivative finite difference length
 * `gamma`    : search gamma
 * `verbose`  : true: print out intermediate results as searches for root 
-* `T`        : Type (precision) of computation: Float64, BigFloat, etc
 
 """
 function compute_om(
-    nr::Integer,
-    nl::Integer,
-    s::Integer,
-    l::Integer,
-    m::Integer,
-    a::Real,
-    om::Complex;
-    tolerance::Real = 1e6,
-    epsilon::Real = 1e-6,
-    gamma::Real = 1.0,
-    verbose::Bool = false,
-    T::Type{<:Real} = Float64,
-)
+        nr::Integer,
+        nl::Integer,
+        s::Integer,
+        l::Integer,
+        m::Integer,
+        a::T,
+        om::Complex{T},
+        tolerance::T = 1e6,
+        epsilon::T = 1e-6,
+        gamma::T = 1.0,
+        verbose::T = false
+    ) where T<:Real
+
+    TR = typeof(a)
 
     om_n = -1000.0 + 0.0im
     om_np1 = om
 
-    f(omega) = F(nr, nl, s, l, m, a, omega, T)
+    f(omega) = F(nr, nl, s, l, m, a, omega)
 
     ## Newton search with 2nd order finite differences
 
@@ -108,14 +114,14 @@ function compute_om(
         ## if too many iterations, reduce search step size
         iterations += 1
         if iterations % 100 == 0
-            newgamma /= T(2)
+            newgamma /= 2 
         end
 
         om_n = om_np1
 
         df = (
-            (f(om_n + epsilon) - f(om_n - epsilon)) / (T(2) * epsilon) +
-            (f(om_n + im * epsilon) - f(om_n - im * epsilon)) / (T(2) * im * epsilon)
+            (f(om_n + epsilon) - f(om_n - epsilon)) / (2 * epsilon) +
+            (f(om_n + im * epsilon) - f(om_n - im * epsilon)) / (2 * im * epsilon)
         )
         om_np1 = om_n - newgamma * f(om_n) / df
 
@@ -127,8 +133,8 @@ function compute_om(
     lmin = max(abs(s), abs(m))
     neig = l - lmin + 1 # number of eigenvalues
 
-    la_s, v_s = SH.eig_vals_vecs(nl, neig, s, m, a * om_np1, T)
-    la_r, v_r, rvals = RD.eig_vals_vecs_c(nr, s, m, a, om_np1, T)
+    la_s, v_s = SH.eig_vals_vecs(nl, neig, s, m, a * om_np1)
+    la_r, v_r, rvals = RD.eig_vals_vecs_c(nr, s, m, a, om_np1)
 
     return om_np1, la_r, v_s[:, l-lmin+1], v_r, rvals
 end

@@ -1,13 +1,15 @@
 module QNMFileUtils
 
+include("../qnmtables/ReadQNM.jl")
 include("../src/Chebyshev.jl")
+include("../src/TeukolskyQNMFunctions.jl")
 import .Chebyshev as CH
-import TeukolskyQNMFunctions as QNM
+import .TeukolskyQNMFunctions as QNM
+import .ReadQNM
 
 import HDF5
-import PyCall
 
-export generate_data
+export generate
 
 function save_to_file!(
     fname::String,
@@ -64,20 +66,13 @@ function generate_data(
     coef_tolerance::Real = 1e-6,
     epsilon::Real = 1e-6,
 )
-    qnmlib = PyCall.pyimport("qnm")
-
     for a in avals
         nrtmp = nr
         nltmp = nl
         while true
             println("nr=$nrtmp\tnl=$nltmp\ta=$a")
-            lib = qnmlib.modes_cache(
-                s = convert(Int64, s),
-                l = convert(Int64, l),
-                m = convert(Int64, m),
-                n = convert(Int64, n),
-            )
-            om, la, cs = lib(a = convert(Float64, min(a, 0.9999999)))
+            om, la = ReadQNM.qnm(n, s, m, l, a)
+           
             omega, lambda, vs, vr, rs = QNM.compute_om(
                 nrtmp,
                 nltmp,
@@ -90,6 +85,7 @@ function generate_data(
                 epsilon = epsilon,
                 gamma = 1.0 - a,
             )
+            println("here $om $la")
             chebcoef = CH.to_cheb(vr)
             if ((abs(chebcoef[end]) < coef_tolerance) && (abs(vs[end]) < coef_tolerance))
                 println("ω=$omega, Λ=$lambda")
@@ -118,6 +114,44 @@ function generate_data(
             if (abs(vs[end]) > coef_tolerance)
                 nltmp += Int64(ceil(nltmp / 2))
             end
+        end
+    end
+    return nothing
+end
+
+function generate(
+    prename::String,
+    nr::Integer,
+    nl::Integer,
+    s::Integer,
+    m::Integer,
+    l::Integer,
+    n::Integer,
+    avals::Vector{<:Real},
+    qnm_tolerance::Real,
+    coef_tolerance::Real,
+    epsilon::Real,
+)
+    lmin = max(abs(s), abs(m))
+    for l in [lmin, lmin + 1, lmin + 2]
+        try
+            println("s=$s,m=$m,n=$n,l=$l")
+            generate_data(
+                "$(pwd())/qnmfiles/$(prename)s$(s)_m$(m)_n$(n)",
+                nr,
+                nl,
+                s,
+                n,
+                l,
+                m,
+                [a for a in avals],
+                qnm_tolerance = qnm_tolerance,
+                coef_tolerance = coef_tolerance,
+                epsilon = epsilon,
+            )
+        catch err
+            println(err)
+            continue
         end
     end
     return nothing

@@ -14,7 +14,7 @@ import Test: @test
 
 ##============================================================
 """
-    interval_laplacian_ch(nx::Integer, neig::Integer, xmin::Real, xmax::Real, T::Type{<:Real}=Float64)
+    interval_laplacian_ch(nx::Integer, neig::Integer, xmin::Real, xmax::Real)
 
 Compare Eigenvalues on an interval using D2 
 """
@@ -22,11 +22,10 @@ function interval_laplacian_ch(
     nx::Integer,
     neig::Integer,
     xmin::Real,
-    xmax::Real,
-    T::Type{<:Real} = Float64,
+    xmax::Real
 )
 
-    D1 = CH.mat_D1(xmin, xmax, nx, T)
+    D1 = CH.mat_D1(xmin, xmax, nx)
     D2 = -D1 * D1
 
     D2[1, 1] = 1.0
@@ -46,7 +45,7 @@ function interval_laplacian_ch(
 end
 
 """
-    interval_laplacian_fd(nx::Integer, neig::Integer, xmin::Real, xmax::Real, T::Type{<:Real}=Float64)
+    interval_laplacian_fd(nx::Integer, neig::Integer, xmin::Real, xmax::Real)
 
 Compare Eigenvalues on an interval using finite difference D2 
 """
@@ -54,11 +53,10 @@ function interval_laplacian_fd(
     nx::Integer,
     neig::Integer,
     xmin::Real,
-    xmax::Real,
-    T::Type{<:Real} = Float64,
+    xmax::Real
 )
 
-    D2 = -CH.mat_fd_D2(xmin, xmax, nx, T)
+    D2 = -CH.mat_fd_D2(xmin, xmax, nx)
 
     D2[1, 1] = 1.0
     D2[1, 2:end] .= 0.0

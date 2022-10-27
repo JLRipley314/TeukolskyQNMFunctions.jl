@@ -5,7 +5,7 @@ export compare_to_qnm
 const tolerance = 1e-3 ## tolerance we compare to
 
 include("../src/RadialODE.jl")
-include("ReadQNM.jl")
+include("../qnmtables/ReadQNM.jl")
 using .ReadQNM
 import .RadialODE as RO
 import Test: @test
@@ -19,8 +19,7 @@ import Test: @test
           n::Integer,
           l::Integer,
           m::Integer,
-          avals::Vector{<:Real},
-          T::Type{<:Real}=Float64
+          avals::Vector{<:Real}
        )
 
 Compare against values computed by Leo Stein's qnm code,
@@ -32,8 +31,7 @@ function compare_to_qnm(
       n::Integer,
       l::Integer,
       m::Integer,
-      avals::Vector{<:Real},
-      T::Type{<:Real}=Float64
+      avals::Vector{<:Real}
    )
    
    println("Comparison to qnm library: s=$s, n=$n, l=$l, m=$m") 
@@ -41,7 +39,7 @@ function compare_to_qnm(
    for a in avals
       om, la = qnm(n,s,m,l,a)
 
-      ls_c, vs_c = RO.eig_vals_vecs_c(nr, s, m, a, om, T)
+      ls_c, vs_c = RO.eig_vals_vecs_c(nr, s, m, a, om)
 
       #println("testing: a=$a, ω=$om\nΛ=$la, Cheb Λ=$(ls_c[1])")
 

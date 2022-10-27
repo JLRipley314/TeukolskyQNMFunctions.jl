@@ -1,7 +1,7 @@
 module TestChebyshev
 
 export test_convergence,
-    test_convergence_fd, test_X_matrices, test_to_cheb, test_to_cheb_to_real
+    test_X_matrices, test_to_cheb, test_to_cheb_to_real
 
 include("../src/Chebyshev.jl")
 
@@ -32,7 +32,6 @@ end
         f::Function,
         d1f::Function,
         d2f::Function,
-        T::Type{<:Real}=Float64
     )
 
 Evaluate derivative compared to analytic value.
@@ -44,52 +43,11 @@ function evaluate_difference(
     f::Function,
     d1f::Function,
     d2f::Function,
-    T::Type{<:Real} = Float64,
 )
-    xvals = CH.cheb_pts(xmin, xmax, nx, T)
+    xvals = CH.cheb_pts(xmin, xmax, nx)
 
-    D1 = CH.mat_D1(xmin, xmax, nx, T)
+    D1 = CH.mat_D1(xmin, xmax, nx)
     D2 = D1 * D1
-
-    fv = [f(x) for x in xvals]
-    d1fv = [d1f(x) for x in xvals]
-    d2fv = [d2f(x) for x in xvals]
-
-    compare_d1fv = D1 * fv
-    compare_d2fv = D2 * fv
-
-    norm_d1 = one_norm(compare_d1fv .- d1fv)
-    norm_d2 = one_norm(compare_d2fv .- d2fv)
-
-    return norm_d1, norm_d2
-end
-
-"""
-    evaluate_difference_fd(
-        nx::Integer,
-        xmin::Real,
-        xmax::Real,
-        f::Function,
-        d1f::Function,
-        d2f::Function,
-        T::Type{<:Real}=Float64
-    )
-
-Evaluate finite difference derivative compared to analytic value.
-"""
-function evaluate_difference_fd(
-    nx::Integer,
-    xmin::Real,
-    xmax::Real,
-    f::Function,
-    d1f::Function,
-    d2f::Function,
-    T::Type{<:Real} = Float64,
-)
-    xvals = CH.cheb_pts(xmin, xmax, nx, T)
-
-    D1 = CH.mat_fd_D1(xmin, xmax, nx, T)
-    D2 = CH.mat_fd_D2(xmin, xmax, nx, T)
 
     fv = [f(x) for x in xvals]
     d1fv = [d1f(x) for x in xvals]
@@ -112,7 +70,6 @@ end
         f::Function,
         d1f::Function,
         d2f::Function,
-        T::Type{<:Real}=Float64
     )
 
 Evaluate convergence of the derivative matrices.
@@ -123,13 +80,12 @@ function test_convergence(
     xmax::Real,
     f::Function,
     d1f::Function,
-    d2f::Function,
-    T::Type{<:Real} = Float64,
+    d2f::Function
 )
 
-    norm_d1_1, norm_d2_1 = evaluate_difference(nx, xmin, xmax, f, d1f, d2f, T)
+    norm_d1_1, norm_d2_1 = evaluate_difference(nx, xmin, xmax, f, d1f, d2f)
     norm_d1_2, norm_d2_2 =
-        evaluate_difference(convert(Int64, ceil(1.1 * nx)), xmin, xmax, f, d1f, d2f, T)
+        evaluate_difference(convert(Int64, ceil(1.1 * nx)), xmin, xmax, f, d1f, d2f)
 
     @test norm_d1_1 / norm_d1_2 > 5.0
     @test norm_d2_1 / norm_d2_2 > 5.0
@@ -138,50 +94,19 @@ function test_convergence(
 end
 
 """
-    test_convergence_fd(
-        nx::Integer,
-        xmin::Real,
-        xmax::Real,
-        f::Function,
-        d1f::Function,
-        d2f::Function,
-        T::Type{<:Real}=Float64
-    )
-
-Evaluate convergence of the finite difference derivative matrices.
-"""
-function test_convergence_fd(
-    nx::Integer,
-    xmin::Real,
-    xmax::Real,
-    f::Function,
-    d1f::Function,
-    d2f::Function,
-    T::Type{<:Real} = Float64,
-)
-
-    norm_d1_1, norm_d2_1 = evaluate_difference_fd(nx, xmin, xmax, f, d1f, d2f, T)
-    norm_d1_2, norm_d2_2 =
-        evaluate_difference_fd(convert(Int64, ceil(2 * nx)), xmin, xmax, f, d1f, d2f, T)
-
-    @test norm_d1_1 / norm_d1_2 > 3.5
-    @test norm_d2_1 / norm_d2_2 > 3.5
-
-    return nothing
-end
-
-"""
-    test_X_matrices(nx::Integer, xmin::Real, xmax::Real, T::Type{<:Real}=Float64)
+    test_X_matrices(nx::Integer, xmin::Real, xmax::Real)
 
 Evaluate derivative on the X matrices
 """
-function test_X_matrices(nx::Integer, xmin::Real, xmax::Real, T::Type{<:Real} = Float64)
+function test_X_matrices(nx::Integer, xmin::Real, xmax::Real)
 
-    i_1 = ones(T, nx)
-    D_1 = CH.mat_D1(xmin, xmax, nx, T)
-    X_1 = CH.mat_X(xmin, xmax, nx, T)
+    TR = typeof(xmin)
 
-    i_2 = ones(T, convert(Int64, ceil(1.1 * nx)))
+    i_1 = ones(TR, nx)
+    D_1 = CH.mat_D1(xmin, xmax, nx)
+    X_1 = CH.mat_X(xmin, xmax, nx)
+
+    i_2 = ones(TR, convert(Int64, ceil(1.1 * nx)))
     D_2 = CH.mat_D1(xmin, xmax, convert(Int64, ceil(1.1 * nx)))
     X_2 = CH.mat_X(xmin, xmax, convert(Int64, ceil(1.1 * nx)))
 
@@ -194,18 +119,18 @@ function test_X_matrices(nx::Integer, xmin::Real, xmax::Real, T::Type{<:Real} = 
 end
 
 """
-    test_to_cheb(nx::Integer, T::Type{<:Real}=Float64)
+    test_to_cheb(nx::Integer)
 
 Test can recover Chebyshev coefficients from real space data. 
 """
-function test_to_cheb(nx::Integer, T::Type{<:Real} = Float64)
+function test_to_cheb(nx::Integer)
 
-    i_1 = ones(T, nx)
-    X_1 = CH.mat_X(-1.0, 1.0, nx, T)
+    i_1 = ones(Float64, nx)
+    X_1 = CH.mat_X(-1.0, 1.0, nx)
 
     for n = 0:(nx-5)
         values = cos.(n * acos.(X_1 * i_1)) ## nth Chebyshev polynomial
-        c_1 = CH.to_cheb(values, T) ## coefficients, only nth should be nonzero
+        c_1 = CH.to_cheb(values) ## coefficients, only nth should be nonzero
         for i = 1:nx
             if i == n + 1
                 @test abs(c_1[i] - 1.0) < 1e-14
@@ -218,7 +143,7 @@ function test_to_cheb(nx::Integer, T::Type{<:Real} = Float64)
 end
 
 """
-    test_to_cheb_to_real(nx::Integer, xmin::Real, xmax::Real, T::Type{<:Real}=Float64)
+    test_to_cheb_to_real(nx::Integer, xmin::Real, xmax::Real)
 
 Test can go to and from Chebyshev space correctly. 
 """
@@ -226,26 +151,26 @@ function test_to_cheb_to_real(
     nx::Integer,
     xmin::Real,
     xmax::Real,
-    T::Type{<:Real} = Float64,
 )
+    TR = typeof(xmin)
 
     nx_1 = nx
     nx_2 = convert(Int64, ceil(1.1 * nx))
 
-    i_1 = ones(T, nx_1)
-    X_1 = CH.mat_X(xmin, xmax, nx_1, T)
+    i_1 = ones(TR, nx_1)
+    X_1 = CH.mat_X(xmin, xmax, nx_1)
     xv = X_1 * i_1
     values = tanh.(xv)
-    c_1 = CH.to_cheb(values, T)
-    r_1 = CH.to_real(c_1, T)
+    c_1 = CH.to_cheb(values)
+    r_1 = CH.to_real(c_1)
     n_1 = one_norm(values .- r_1)
 
-    i_2 = ones(T, nx_2)
-    X_2 = CH.mat_X(xmin, xmax, nx_2, T)
+    i_2 = ones(TR, nx_2)
+    X_2 = CH.mat_X(xmin, xmax, nx_2)
     xv = X_2 * i_2
     values = tanh.(xv)
-    c_2 = CH.to_cheb(values, T)
-    r_2 = CH.to_real(c_2, T)
+    c_2 = CH.to_cheb(values)
+    r_2 = CH.to_real(c_2)
 
     n_2 = one_norm(values .- r_2)
 

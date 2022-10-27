@@ -20,7 +20,7 @@ function qnm(
     T::Type{<:Real} = Float64,
 )
 
-    for line in eachline("qnmvals.txt")
+    for line in eachline("../qnmtables/qnmvals.txt")
         line = split(line, ",")
         nl = parse(T, line[1])
         sl = parse(T, line[2])

@@ -1,7 +1,5 @@
-
-
-include("GenerateFiles.jl")
-using .GenerateFiles
+include("QNMFileUtils.jl")
+import .QNMFileUtils as QF
 
 println("generating qnm files")
 
@@ -16,4 +14,4 @@ qnm_tolerance = 1e-6
 coef_tolerance = 1e-6
 epsilon = 1e-6
 
-generate("", nr, nl, s, m, l, n, avals, qnm_tolerance, coef_tolerance, epsilon)
+QF.generate("", nr, nl, s, m, l, n, avals, qnm_tolerance, coef_tolerance, epsilon)
