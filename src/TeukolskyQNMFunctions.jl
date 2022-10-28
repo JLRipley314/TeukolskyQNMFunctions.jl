@@ -29,14 +29,14 @@ import .RadialODE as RD
 Compute the absolute difference of Lambda seperation constant for radial and angular ODEs.
 """
 function F(
-        nr::Integer,
-        nl::Integer,
-        s::Integer,
-        l::Integer,
-        m::Integer,
-        a::T,
-        om::Complex{T}
-    ) where T<:Real
+    nr::Integer,
+    nl::Integer,
+    s::Integer,
+    l::Integer,
+    m::Integer,
+    a::T,
+    om::Complex{T},
+) where {T<:Real}
 
     lmin = max(abs(s), abs(m))
     neig = l - lmin + 1 # number of eigenvalues
@@ -85,18 +85,18 @@ Search for quasinormal mode frequency in the complex plane using Newton's method
 
 """
 function compute_om(
-        nr::Integer,
-        nl::Integer,
-        s::Integer,
-        l::Integer,
-        m::Integer,
-        a::T,
-        om::Complex{T},
-        tolerance::T = 1e6,
-        epsilon::T = 1e-6,
-        gamma::T = 1.0,
-        verbose::T = false
-    ) where T<:Real
+    nr::Integer,
+    nl::Integer,
+    s::Integer,
+    l::Integer,
+    m::Integer,
+    a::T,
+    om::Complex{T},
+    tolerance::T = 1e6,
+    epsilon::T = 1e-6,
+    gamma::T = 1.0,
+    verbose::T = false,
+) where {T<:Real}
 
     TR = typeof(a)
 
@@ -114,7 +114,7 @@ function compute_om(
         ## if too many iterations, reduce search step size
         iterations += 1
         if iterations % 100 == 0
-            newgamma /= 2 
+            newgamma /= 2
         end
 
         om_n = om_np1

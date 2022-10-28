@@ -21,10 +21,10 @@ end
 
 Computes Chebyshev points on interval [xmin,xmax] 
 """
-function cheb_pts(xmin::T, xmax::T, nx::Integer) where T<:Real
+function cheb_pts(xmin::T, xmax::T, nx::Integer) where {T<:Real}
     pts = cheb_pts(nx, typeof(xmin))
-    m = (xmax - xmin) / 2 
-    b = (xmax + xmin) / 2 
+    m = (xmax - xmin) / 2
+    b = (xmax + xmin) / 2
     return [m * pts[i] + b for i = 1:nx]
 end
 
@@ -42,7 +42,7 @@ function mat_X(xmin::Real, xmax::Real, nx::Integer)
 
     TI = typeof(nx)
     TR = typeof(xmax)
-    
+
     X = Vector{TI}(undef, 0)
     Y = Vector{TI}(undef, 0)
     V = Vector{TR}(undef, 0)
@@ -70,7 +70,7 @@ Computes derivative matrix D1 in real space.
 function mat_D1(xmin::Real, xmax::Real, nx::Integer)
     @assert nx > 4
     TR = typeof(xmin)
-    
+
     M = Matrix{TR}(undef, nx, nx)
     n = nx - 1
     pts = cheb_pts(nx, TR)
@@ -78,7 +78,7 @@ function mat_D1(xmin::Real, xmax::Real, nx::Integer)
     M[1, 1] = (2 * (n^2) + 1) // 6
     M[nx, nx] = -M[1, 1]
 
-    M[1, nx] = (1//2) * ((-1)^n)
+    M[1, nx] = (1 // 2) * ((-1)^n)
     M[nx, 1] = -M[1, nx]
 
     for i = 2:(nx-1)

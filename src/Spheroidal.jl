@@ -13,7 +13,7 @@ using GenericSchur
 
 Compute the minimum l value
 """
-function compute_l_min(s::Integer, m::Integer)
+@inline function compute_l_min(s::Integer, m::Integer)
     return max(abs(s), abs(m))
 end
 
@@ -63,15 +63,17 @@ arXiv:2202.03837
     end
 end
 """
-    mat_Y(nl::Integer, s::Integer, m::Integer, T::Type{<:Real}=Float64)
+    mat_Y(nl::Integer, s::Integer, m::Integer)
 
 Compute the matrix for y in spectral space.
 """
-function mat_Y(nl::Integer, s::Integer, m::Integer, T::Type{<:Real} = Float64)
+function mat_Y(nl::Integer, s::Integer, m::Integer)
 
-    I = Vector{typeof(nl)}(undef, 0)
-    J = Vector{typeof(nl)}(undef, 0)
-    V = Vector{T}(undef, 0)
+    TI = typeof(nl)
+
+    I = Vector{TI}(undef, 0)
+    J = Vector{TI}(undef, 0)
+    V = Vector{Rational{TI}}(undef, 0)
 
     lmin = compute_l_min(s, m)
 
@@ -101,15 +103,16 @@ function mat_Y(nl::Integer, s::Integer, m::Integer, T::Type{<:Real} = Float64)
 end
 
 """
-    function mat_L(nl::Integer, s::Integer, m::Integer, T::Type{<:Real}=Float64)
+    function mat_L(nl::Integer, s::Integer, m::Integer)
 
 Compute the matrix for spherical laplacian (s=0) in spectral space.
 """
-function mat_L(nl::Integer, s::Integer, m::Integer, T::Type{<:Real} = Float64)
-
-    I = Vector{typeof(nl)}(undef, 0)
-    J = Vector{typeof(nl)}(undef, 0)
-    V = Vector{T}(undef, 0)
+function mat_L(nl::Integer, s::Integer, m::Integer)
+    TI = typeof(nl)
+    
+    I = Vector{TI}(undef, 0)
+    J = Vector{TI}(undef, 0)
+    V = Vector{TI}(undef, 0)
 
     lmin = compute_l_min(s, m)
 
@@ -120,12 +123,12 @@ function mat_L(nl::Integer, s::Integer, m::Integer, T::Type{<:Real} = Float64)
         ## (l,l) component 
         append!(I, i)
         append!(J, i)
-        append!(V, (l - s) * (l + s + 1.0))
+        append!(V, (l - s) * (l + s + 1))
     end
     return sparse(I, J, V)
 end
 """
-    compute_M_matrix(nl::Integer, s::Integer, m::Integer, c::Complex, T::Type{<:Real}=Float64)
+    compute_M_matrix(nl::Integer, s::Integer, m::Integer, c::Complex)
 
 Compute the matrix for computing spheroidal-spherical mixing and seperation coefficients.
 """
@@ -133,15 +136,14 @@ function compute_M_matrix(
     nl::Integer,
     s::Integer,
     m::Integer,
-    c::Complex,
-    T::Type{<:Real} = Float64,
+    c::Complex
 )
-    Y1 = mat_Y(nl + 2, s, m, T) # look at larger to capture last term in matrix mult
+    Y1 = Matrix{typeof(c)}(mat_Y(nl + 2, s, m)) # look at larger to capture last term in matrix mult
     # at higher l
     Y2 = Y1 * Y1
     Y1 = Y1[1:nl, 1:nl]
     Y2 = Y2[1:nl, 1:nl]
-    L = mat_L(nl, s, m, T)
+    L = mat_L(nl, s, m)
 
     return sparse(transpose(-(c^2) * Y2 + 2 * c * s * Y1 + L))
 
@@ -160,11 +162,10 @@ function eig_vals_vecs(
     neig::Integer,
     s::Integer,
     m::Integer,
-    c::Complex,
-    T::Type{<:Real} = Float64,
+    c::Complex
 )
 
-    Mat = compute_M_matrix(nl, s, m, c, T)
+    Mat = compute_M_matrix(nl, s, m, c)
 
     for i = 1:nl
         Mat[i, i] += 1 # shift to avoid issues with a zero eigenvalue (shift back at the end)

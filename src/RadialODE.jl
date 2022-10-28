@@ -27,16 +27,16 @@ using SparseArrays
     ) where T<:Real
 """
 function radial_discretized_eqn_c(
-        nr::Integer,
-        s::Integer,
-        m::Integer,
-        a::T,
-        bhm::T,
-        om::Complex{T},
-        rmin::T,
-        rmax::T
-    ) where T<:Real
-    
+    nr::Integer,
+    s::Integer,
+    m::Integer,
+    a::T,
+    bhm::T,
+    om::Complex{T},
+    rmin::T,
+    rmax::T,
+) where {T<:Real}
+
     D1 = CH.mat_D1(rmin, rmax, nr)
     D2 = D1 * D1
 
@@ -82,13 +82,13 @@ using a pseudospectral Chebyshev polynomial method.
 The black hole mass is always one.
 """
 function eig_vals_vecs_c(
-        nr::Integer,
-        s::Integer,
-        m::Integer,
-        a::T,
-        om::Complex{T}
-    ) where T<:Real
-    
+    nr::Integer,
+    s::Integer,
+    m::Integer,
+    a::T,
+    om::Complex{T},
+) where {T<:Real}
+
     TR = typeof(a)
 
     bhm = TR(1) ## always have unit black hole mass
