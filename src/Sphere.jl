@@ -5,7 +5,7 @@ module Sphere
 
 setprecision(2048) # BigFloat precision in bits
 
-import FastGaussQuadrature as FGQ
+import QuadGK 
 import Jacobi: jacobi
 
 export Y_vals,
@@ -16,8 +16,8 @@ export Y_vals,
     swal_filter_matrix,
     angular_matrix_mult!
 
-function convertBF(v)
-    return parse(BigFloat, "$v")
+function cBF(v::Number)
+    return convert(BigFloat, v)
 end
 
 """
@@ -31,18 +31,6 @@ are hard coded in Sphere.jl
 function num_l(ny::Integer, max_s::Integer = 2, max_m::Integer = 6)
     @assert ny > (2 * max_s + 2 * max_m) + 4
     return ny - 2 * max_s - 2 * max_m
-end
-
-"""
-    Y_vals(ny::Integer)
-
-Compute the Gauss-Legendre points (y) over the interval [-1,1].
-"""
-function Y_vals(ny::Integer)
-
-    roots, weights = FGQ.gausslegendre(ny)
-
-    return roots
 end
 
 """
@@ -60,7 +48,7 @@ return: ∫ dy v1 conj(v2)
 function inner_product(v1::Vector{T}, v2::Vector{T})::T where {T<:Number}
     ny = size(v1)[1]
 
-    roots, weights = FGQ.gausslegendre(ny)
+    _, weights = QuadGK.gauss(typeof(real(v1[1])),ny)
 
     s = 0.0
     for j = 1:ny
@@ -71,32 +59,39 @@ function inner_product(v1::Vector{T}, v2::Vector{T})::T where {T<:Number}
 end
 
 """
-    cos_vals(ny::Integer)
+    Y_vals(ny::Integer, T::Type{<:Real}=Float64)
 
-Compute cos(y) at Gauss-Legendre points over interval [-1,1].
+Compute the Gauss-Legendre points (y) over the interval [-1,1].
 """
-function cos_vals(ny::Integer)
+function Y_vals(ny::Integer, T::Type{<:Real}=Float64)
 
-    roots, weights = FGQ.gausslegendre(ny)
+    roots, _ = QuadGK.gauss(T, ny)
 
-    return [-pt for pt in roots]
+    return roots
 end
 
 """
-    sin_vals(
-       ny::Integer
-       )
+    cos_vals(ny::Integer, T::Type{<:Real}=Float64)
+
+Compute cos(y) at Gauss-Legendre points over interval [-1,1].
+"""
+function cos_vals(ny::Integer, T::Type{<:Real}=Float64)
+
+    yv = Y_vals(ny, T)
+
+    return -yv 
+end
+
+"""
+    sin_vals(ny::Integer, T::Type{<:Real}=Float64)
 
 Compute sin(y) at Gauss-Legendre points over interval [-1,1].
 """
-function sin_vals(ny::Integer)
+function sin_vals(ny::Integer, T::Type{<:Real}=Float64)
 
-    roots, weights = FGQ.gausslegendre(ny)
+    yv = Y_vals(ny, T)
 
-    return [
-        convert(Float64, sqrt(1.0 - convertBF(pt)) * sqrt(1.0 + convertBF(pt))) for
-        pt in roots
-    ]
+    return [sqrt(1 - y) * sqrt(1 + y) for y in yv]
 end
 
 """
@@ -112,79 +107,73 @@ Compute the spin-weighted associated Legendre function Y^s_{lm}(y).
 function swal(spin::Integer, m_ang::Integer, l_ang::Integer, y::Real)
     @assert l_ang >= abs(m_ang)
 
+    TR = typeof(y)
+
     al = abs(m_ang - spin)
     be = abs(m_ang + spin)
     @assert((al + be) % 2 == 0)
     n = l_ang - (al + be) / 2
 
     if n < 0
-        return convert(Float64, 0)
+        return convert(TR, 0)
     end
 
     norm = sqrt(
         (2 * n + al + be + 1) *
-        (convertBF(2)^(-al - be - 1.0)) *
-        factorial(convertBF(n + al + be)) / factorial(convertBF(n + al)) *
-        factorial(convertBF(n)) / factorial(convertBF(n + be)),
+        (2^(-al - be - 1.0)) *
+        factorial(cBF(n + al + be)) / factorial(cBF(n + al)) *
+        factorial(cBF(n)) / factorial(cBF(n + be)),
     )
-    norm *= convertBF(-1)^(max(m_ang, -spin))
+    norm *= (-1)^(max(m_ang, -spin))
 
     return convert(
-        Float64,
+        TR,
         norm *
-        (convertBF(1 - y)^(al / 2.0)) *
-        (convertBF(1 + y)^(be / 2.0)) *
-        jacobi(convertBF(y), convertBF(n), convertBF(al), convertBF(be)),
+        ((1 - y)^(al / 2)) *
+        ((1 + y)^(be / 2)) *
+        jacobi(y, cBF(n), cBF(al), cBF(be)),
     )
 end
 
 """
-    swal_vals(
-       ny::Integer,
-       spin::Integer,
-       m_ang::Integer,
-       )
+    swal_vals(ny::Integer, spin::Integer, m_ang::Integer, T::Type{<:Real}=Float64)
 
 Compute the matrix swal^s_{lm}(y) at Gauss-Legendre points,
 over a grid of l values (and fixed m).
 """
-function swal_vals(ny::Integer, spin::Integer, m_ang::Integer)
+function swal_vals(ny::Integer, spin::Integer, m_ang::Integer, T::Type{<:Real}=Float64)
 
-    roots, weights = FGQ.gausslegendre(ny)
+    yv = Y_vals(ny, T) 
 
     nl = num_l(ny)
 
-    vals = zeros(Float64, ny, nl)
+    vals = zeros(T, ny, nl)
 
     lmin = max(abs(spin), abs(m_ang))
 
     for k = 1:nl
         l_ang = k - 1 + lmin
-        for j = 1:length(roots)
-            vals[j, k] = swal(spin, m_ang, l_ang, roots[j])
+        for (j,y) in enumerate(yv)
+            vals[j, k] = swal(spin, m_ang, l_ang, y)
         end
     end
     return vals
 end
 
 """
-    swal_laplacian_matrix(
-       ny::Integer,
-       spin::Integer,
-       m_ang::Integer
-       )
+    swal_laplacian_matrix(ny::Integer, spin::Integer, m_ang::Integer, T::Type{<:Real}=Float64)
 
 Compute the matrix to compute spin-weighted spherical harmonic laplacian.
 To compute the spherical laplacian use the function 
 set_lap!(v_lap,v,lap_matrix)
 """
-function swal_laplacian_matrix(ny::Integer, spin::Integer, m_ang::Integer)
+function swal_laplacian_matrix(ny::Integer, spin::Integer, m_ang::Integer, T::Type{<:Real}=Float64)
 
-    rv, wv = FGQ.gausslegendre(ny)
+    rv, wv = QuadGK.gauss(T, ny)
 
     nl = num_l(ny)
 
-    lap = zeros(Float64, ny, ny)
+    lap = zeros(T, ny, ny)
 
     lmin = max(abs(spin), abs(m_ang))
 
@@ -194,7 +183,7 @@ function swal_laplacian_matrix(ny::Integer, spin::Integer, m_ang::Integer)
                 l = k - 1 + lmin
                 lap[j, i] -=
                     (l - spin) *
-                    (l + spin + 1.0) *
+                    (l + spin + 1) *
                     (swal(spin, m_ang, l, rv[i]) * swal(spin, m_ang, l, rv[j]))
             end
             lap[j, i] *= wv[j]
@@ -205,22 +194,18 @@ function swal_laplacian_matrix(ny::Integer, spin::Integer, m_ang::Integer)
 end
 
 """
-    swal_filter_matrix(
-       ny::Integer,
-       spin::Integer,
-       m_ang::Integer
-       )
+    swal_filter_matrix(ny::Integer, spin::Integer, m_ang::Integer, T::Type{<:Real}=Float64)
 
 Compute the matrix to compute low pass filter.
 Multiply the matrix on the left: v[i]*M[i,j] -> v[j]
 """
-function swal_filter_matrix(ny::Integer, spin::Integer, m_ang::Integer)
+function swal_filter_matrix(ny::Integer, spin::Integer, m_ang::Integer, T::Type{<:Real}=Float64)
 
-    rv, wv = FGQ.gausslegendre(ny)
+    rv, wv = QuadGK.gauss(T, ny)
 
     nl = num_l(ny)
 
-    filter = zeros(Float64, ny, ny)
+    filter = zeros(T, ny, ny)
 
     lmin = max(abs(spin), abs(m_ang))
 
@@ -251,7 +236,7 @@ function angular_matrix_mult!(f_m, f, mat)
     nx, ny = size(f)
     for j = 1:ny
         for i = 1:nx
-            f_m[i, j] = 0.0
+            f_m[i, j] = 0
             for k = 1:ny
                 f_m[i, j] += f[i, k] * mat[k, j]
             end

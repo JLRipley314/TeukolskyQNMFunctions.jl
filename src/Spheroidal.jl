@@ -67,13 +67,11 @@ end
 
 Compute the matrix for y in spectral space.
 """
-function mat_Y(nl::Integer, s::Integer, m::Integer)
+function mat_Y(nl::T, s::T, m::T) where T<:Integer
 
-    TI = typeof(nl)
-
-    I = Vector{TI}(undef, 0)
-    J = Vector{TI}(undef, 0)
-    V = Vector{Rational{TI}}(undef, 0)
+    I = Vector{T}(undef, 0)
+    J = Vector{T}(undef, 0)
+    V = Vector{Rational{T}}(undef, 0)
 
     lmin = compute_l_min(s, m)
 
@@ -107,12 +105,11 @@ end
 
 Compute the matrix for spherical laplacian (s=0) in spectral space.
 """
-function mat_L(nl::Integer, s::Integer, m::Integer)
-    TI = typeof(nl)
+function mat_L(nl::T, s::T, m::T) where T<:Integer
     
-    I = Vector{TI}(undef, 0)
-    J = Vector{TI}(undef, 0)
-    V = Vector{TI}(undef, 0)
+    I = Vector{T}(undef, 0)
+    J = Vector{T}(undef, 0)
+    V = Vector{T}(undef, 0)
 
     lmin = compute_l_min(s, m)
 

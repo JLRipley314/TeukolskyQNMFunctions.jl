@@ -98,8 +98,6 @@ function compute_om(
     verbose::T = false,
 ) where {T<:Real}
 
-    TR = typeof(a)
-
     om_n = -1000.0 + 0.0im
     om_np1 = om
 

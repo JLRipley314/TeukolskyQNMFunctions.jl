@@ -8,21 +8,21 @@ export chep_pts, mat_X, mat_D1, to_cheb, to_real
 using SparseArrays
 
 """
-    cheb_pts(nx::Integer)
+    cheb_pts([T,] nx::Integer)
 
 Computes Generates nx Chebyshev points in [-1,1]
 """
-function cheb_pts(nx::Integer, T::Type{<:Real} = Float64)
+function cheb_pts(::Type{T}, nx::Integer) where T<:AbstractFloat
     return [cos(pi * i / (nx - T(1))) for i = 0:(nx-1)]
 end
 
 """
-    cheb_pts(xmin::T, xmax::T, nx::Integer) where T<:Real
+    cheb_pts(xmin::Real, xmax::Real, nx::Integer)
 
 Computes Chebyshev points on interval [xmin,xmax] 
 """
 function cheb_pts(xmin::T, xmax::T, nx::Integer) where {T<:Real}
-    pts = cheb_pts(nx, typeof(xmin))
+    pts = cheb_pts(T, nx)
     m = (xmax - xmin) / 2
     b = (xmax + xmin) / 2
     return [m * pts[i] + b for i = 1:nx]
@@ -37,11 +37,8 @@ end
 
 Computes matrix for multiplication of x in real space. 
 """
-function mat_X(xmin::Real, xmax::Real, nx::Integer)
+function mat_X(xmin::TR, xmax::TR, nx::TI) where {TR<:AbstractFloat,TI<:Integer}
     @assert nx > 4
-
-    TI = typeof(nx)
-    TR = typeof(xmax)
 
     X = Vector{TI}(undef, 0)
     Y = Vector{TI}(undef, 0)
@@ -67,13 +64,12 @@ end
 
 Computes derivative matrix D1 in real space.
 """
-function mat_D1(xmin::Real, xmax::Real, nx::Integer)
+function mat_D1(xmin::TR, xmax::TR, nx::TI) where {TR<:AbstractFloat,TI<:Integer}
     @assert nx > 4
-    TR = typeof(xmin)
 
     M = Matrix{TR}(undef, nx, nx)
     n = nx - 1
-    pts = cheb_pts(nx, TR)
+    pts = cheb_pts(TR, nx)
 
     M[1, 1] = (2 * (n^2) + 1) // 6
     M[nx, nx] = -M[1, 1]
@@ -113,10 +109,10 @@ end
 
 Convert to Chebyshev space. We assume we are working with Chebyshev-Gauss-Lobatto points.
 """
-function to_cheb(f::Vector{<:Number})
+function to_cheb(f::Vector{T}) where T<:Number
 
     N = length(f) - 1
-    c = zeros(typeof(f[1]), N + 1)
+    c = zeros(T, N + 1)
 
     for i = 1:(N+1)
         n = i - 1
@@ -138,10 +134,10 @@ end
 
 Convert to Real space. We assume we are working with Chebyshev-Gauss-Lobatto points.
 """
-function to_real(c::Vector{<:Number})
+function to_real(c::Vector{T}) where T<:Number
 
     N = length(c) - 1
-    f = zeros(typeof(c[1]), N + 1)
+    f = zeros(T, N + 1)
 
     for i = 1:(N+1)
         n = i - 1
