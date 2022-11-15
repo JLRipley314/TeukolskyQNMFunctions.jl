@@ -91,11 +91,11 @@ function compute_om(
     l::Integer,
     m::Integer,
     a::T,
-    om::Complex{T},
+    om::Complex{T};
     tolerance::T = 1e6,
     epsilon::T = 1e-6,
     gamma::T = 1.0,
-    verbose::T = false,
+    verbose::Bool = false,
 ) where {T<:Real}
 
     om_n = -1000.0 + 0.0im
