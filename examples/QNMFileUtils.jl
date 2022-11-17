@@ -19,15 +19,15 @@ function save_to_file!(
     n::Integer,
     l::Integer,
     m::Integer,
-    a::Real,
-    omega::Complex,
-    lambda::Complex,
-    vs::Vector{<:Complex},
-    vr::Vector{<:Complex},
-    vrc::Vector{<:Complex},
-    rs::Vector{<:Real},
-    tolerance::Real,
-)
+    a::T,
+    omega::Complex{T},
+    lambda::Complex{T},
+    vs::Vector{<:Complex{T}},
+    vr::Vector{<:Complex{T}},
+    vrc::Vector{<:Complex{T}},
+    rs::Vector{<:T},
+    tolerance::T,
+) where {T<:Real}
     HDF5.h5open("$fname.h5", "cw") do file
         g = HDF5.create_group(file, "[a=$(convert(Float64,a)),l=$(convert(Int64,l))]")
         g["nr"] = convert(Int64, nr)
@@ -61,11 +61,11 @@ function generate_data(
     n::Integer,
     l::Integer,
     m::Integer,
-    avals::Vector{<:Real};
-    qnm_tolerance::Real = 1e-6,
-    coef_tolerance::Real = 1e-6,
-    epsilon::Real = 1e-6,
-)
+    avals::Vector{<:T};
+    qnm_tolerance::T = T(1e-6),
+    coef_tolerance::T = T(1e-6),
+    epsilon::T = T(1e-6),
+) where {T<:Real}
     for a in avals
         nrtmp = nr
         nltmp = nl
@@ -80,10 +80,11 @@ function generate_data(
                 l,
                 m,
                 a,
-                om,
+                convert(Complex{T},om),
                 tolerance = qnm_tolerance,
                 epsilon = epsilon,
                 gamma = 1.0 - a,
+                verbose = false,
             )
             println("here $om $la")
             chebcoef = CH.to_cheb(vr)
@@ -127,11 +128,11 @@ function generate(
     m::Integer,
     l::Integer,
     n::Integer,
-    avals::Vector{<:Real},
-    qnm_tolerance::Real,
-    coef_tolerance::Real,
-    epsilon::Real,
-)
+    avals::Vector{<:T},
+    qnm_tolerance::T,
+    coef_tolerance::T,
+    epsilon::T,
+) where {T<:Real}
     lmin = max(abs(s), abs(m))
     for l in [lmin, lmin + 1, lmin + 2]
         try
@@ -144,7 +145,7 @@ function generate(
                 n,
                 l,
                 m,
-                [a for a in avals],
+                avals,
                 qnm_tolerance = qnm_tolerance,
                 coef_tolerance = coef_tolerance,
                 epsilon = epsilon,
