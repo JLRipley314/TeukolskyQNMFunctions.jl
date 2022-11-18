@@ -51,7 +51,11 @@ which describes the ideas that went into this code, please cite
     eprint = "2202.03837",
     archivePrefix = "arXiv",
     primaryClass = "gr-qc",
-    month = "2",
+    doi = "10.1088/1361-6382/ac776d",
+    journal = "Class. Quant. Grav.",
+    volume = "39",
+    number = "14",
+    pages = "145009",
     year = "2022"
 }
 ```
