@@ -134,26 +134,23 @@ function generate(
     epsilon::T,
 ) where {T<:Real}
     lmin = max(abs(s), abs(m))
-    for l in [lmin, lmin + 1, lmin + 2]
-        try
-            println("s=$s,m=$m,n=$n,l=$l")
-            generate_data(
-                "$(pwd())/qnmfiles/$(prename)s$(s)_m$(m)_n$(n)",
-                nr,
-                nl,
-                s,
-                n,
-                l,
-                m,
-                avals,
-                qnm_tolerance = qnm_tolerance,
-                coef_tolerance = coef_tolerance,
-                epsilon = epsilon,
-            )
-        catch err
-            println(err)
-            continue
-        end
+    try
+        println("s=$s,m=$m,n=$n,l=$l")
+        generate_data(
+            "$(pwd())/qnmfiles/$(prename)s$(s)_m$(m)_n$(n)",
+            nr,
+            nl,
+            s,
+            n,
+            l,
+            m,
+            avals,
+            qnm_tolerance = qnm_tolerance,
+            coef_tolerance = coef_tolerance,
+            epsilon = epsilon,
+        )
+    catch err
+        println(err)
     end
     return nothing
 end
