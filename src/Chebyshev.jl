@@ -241,7 +241,41 @@ function mat_TtoC1(::Type{TR},nx::TI) where {TR<:AbstractFloat,TI<:Integer}
     return M
 end
 
-# still needs 
+function mat_C1toC2(::Type{TR},nx::TI) where {TR<:AbstractFloat,TI<:Integer}
+    #M = Matrix{TR}(undef, nx, nx)
+    M = zeros(TR,nx,nx)
+    lambda = TR(1)
+    M[1,1] = 1
+    M[1,2] = -1/3
+    for i = 2:(nx-1)
+        M[i,i] = lambda/(lambda+i-1)
+        M[i,i+1] = -lambda/(lambda+i+1)
+    end
+    return M
+end
+
+"""
+    mat_spec_X(
+          nx::Integer
+       )
+
+Computes matrix for multiplication of x in spectral space. 
+"""
+function mat_C2_D2(::Type{TR},nx::TI) where {TR<:AbstractFloat,TI<:Integer}
+    lambda = 2
+    M = zeros(TR,nx,nx)
+    #M = Matrix{TR}(undef, nx, nx)
+    pts = cheb_pts(TR, nx)
+    mult_fac = 2
+    for i = 1:(nx-1)
+        M[i,i+lambda]=mult_fac*(lambda+i-1)
+
+    end
+
+    return M
+end
+
+# still needs to test
 # C1_to_C2
 # derivative from C1 to C2
 # real_to_C2 (for multiplication)
