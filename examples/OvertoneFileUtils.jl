@@ -123,7 +123,7 @@ function generate(
     try
         println("s=$s,m=$m,n=$n,l=$l")
         generate_data(
-            "$(pwd())/qnmfiles/$(prename)s$(s)_m$(m)_n$(n)",
+            "$(pwd())/qnmfiles/$(prename)s$(s)_m$(m)_n$(n)_nr$(nr)",
             nr,
             nl,
             s,
