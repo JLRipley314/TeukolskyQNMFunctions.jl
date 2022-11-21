@@ -3,7 +3,7 @@ Methods for position space Chebyshev methods.
 """
 module Chebyshev
 
-export cheb_pts, mat_X, mat_D1, to_cheb, to_real, C_to_real, mat_spec_X, mat_spec_D1, mat_CtoT
+export cheb_pts, mat_X, mat_D1, to_cheb, to_real, C1_to_real, mat_C1_X, mat_C1_D1, mat_TtoC1
 
 using SparseArrays
 
@@ -154,7 +154,7 @@ end
 
 Convert to Real space. We assume we are working with Chebyshev-Gauss-Lobatto points.
 """
-function C_to_real(c::Vector{T}) where T<:Number
+function C1_to_real(c::Vector{T}) where T<:Number
 
     N = length(c) - 1
     f = zeros(T, N + 1)
@@ -178,7 +178,7 @@ Computes derivative matrix D1 in spectral space.
 Input Chebyshev polynomial of the first kind and output the second kind.
 See Oliver and Townsend 2.2.
 """
-function mat_spec_D1(::Type{TR},nx::TI) where {TR<:AbstractFloat,TI<:Integer}
+function mat_C1_D1(::Type{TR},nx::TI) where {TR<:AbstractFloat,TI<:Integer}
     M = zeros(TR,nx,nx)
     #M = Matrix{TR}(undef, nx, nx)
     pts = cheb_pts(TR, nx)
@@ -197,7 +197,7 @@ end
 
 Computes matrix for multiplication of x in spectral space. 
 """
-function mat_spec_X(a::Vector{T}) where T<:AbstractFloat
+function mat_C1_X(a::Vector{T}) where T<:AbstractFloat
     nx = length(a)
 
     M = zeros(T,nx,nx) #Matrix{T}(undef, nx, nx)
@@ -223,13 +223,13 @@ end
 
 
 """
-    mat_CtoT(
+    mat_TtoC1(
             a::Vector{T}
        )
 
 Computes matrix for converting 2nd kind coefficients to first kind. 
 """
-function mat_CtoT(::Type{TR},nx::TI) where {TR<:AbstractFloat,TI<:Integer}
+function mat_TtoC1(::Type{TR},nx::TI) where {TR<:AbstractFloat,TI<:Integer}
     #M = Matrix{TR}(undef, nx, nx)
     M = zeros(TR,nx,nx)
     M[1,1] = 1
@@ -241,5 +241,8 @@ function mat_CtoT(::Type{TR},nx::TI) where {TR<:AbstractFloat,TI<:Integer}
     return M
 end
 
-
+# still needs 
+# C1_to_C2
+# derivative from C1 to C2
+# real_to_C2 (for multiplication)
 end # module
