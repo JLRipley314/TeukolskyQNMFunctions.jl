@@ -24,14 +24,14 @@ export compute_S, compute_D, compute_M
 using LinearAlgebra, SparseArrays
 
 """
-   compute_S(n::Integer, lam::Integer)
+   compute_S(n::Int64, lam::Int64)
    Computes n×n S_{λ} matrix.
 """
-function compute_S(::Type{T},n::Integer, lam::Integer) where {T<:AbstractFloat}
+function compute_S(::Type{T},n::Int64, lam::Int64) where {T<:AbstractFloat}
    @assert lam>=0
    @assert n>=3
-   X = Vector{Integer}(undef,0)
-   Y = Vector{Integer}(undef,0)
+   X = Vector{Int64}(undef,0)
+   Y = Vector{Int64}(undef,0)
    V = Vector{T}(undef,0)
    push!(X,1)
    push!(Y,1)
@@ -77,14 +77,14 @@ function compute_S(::Type{T},n::Integer, lam::Integer) where {T<:AbstractFloat}
 end
 
 """
-   compute_D(n::Integer, lam::Integer)
+   compute_D(n::Int64, lam::Int64)
    Computes n×n D_{λ} matrix.
 """
-function compute_D(::Type{T},n::Integer, lam::Integer) where {T<:AbstractFloat}
+function compute_D(::Type{T},n::Int64, lam::Int64) where {T<:AbstractFloat}
    @assert lam>=1
    @assert n>=lam
-   X = Vector{Integer}(undef,0)
-   Y = Vector{Integer}(undef,0)
+   X = Vector{Int64}(undef,0)
+   Y = Vector{Int64}(undef,0)
    V = Vector{T}(undef,0)
    for i=1:(n-lam)
       push!(X,i)
@@ -100,7 +100,7 @@ function compute_D(::Type{T},n::Integer, lam::Integer) where {T<:AbstractFloat}
 end
 
 """
-   compute_M(n::Integer, lam::Integer)
+   compute_M(n::Int64, lam::Int64)
    Computes n×n M_{λ} matrix for polynomial x.
    For a simple derivation see Sec. 6.3.1 of
       Computing with functions in two dimensions,
@@ -109,11 +109,11 @@ end
    This can be accessed at
    https://pi.math.cornell.edu/~ajt/
 """
-function compute_M(::Type{T},n::Integer, lam::Integer) where {T<:AbstractFloat}
+function compute_M(::Type{T},n::Int64, lam::Int64) where {T<:AbstractFloat}
    @assert lam>=1
    @assert n>=lam
-   X = Vector{Integer}(undef,0)
-   Y = Vector{Integer}(undef,0)
+   X = Vector{Int64}(undef,0)
+   Y = Vector{Int64}(undef,0)
    V = Vector{T}(undef,0)
    push!(X,1)
    push!(Y,2)
@@ -133,10 +133,10 @@ function compute_M(::Type{T},n::Integer, lam::Integer) where {T<:AbstractFloat}
 end
 
 """
-   compute_D(n::Integer, lam::Integer)
+   compute_D(n::Int64, lam::Int64)
    Computes n×n D_{λ} matrix over the interval [xmin,xmax].
 """
-function compute_D(::Type{T}, n::Integer, lam::Integer, xmin::T, xmax::T) where {T<:AbstractFloat}
+function compute_D(::Type{T}, n::Int64, lam::Int64, xmin::T, xmax::T) where {T<:AbstractFloat}
    D = compute_D(T,n,lam)
    
    a = T(0.5*(xmax-xmin))
@@ -145,11 +145,11 @@ function compute_D(::Type{T}, n::Integer, lam::Integer, xmin::T, xmax::T) where 
 end
 
 """
-   compute_M(n::Integer, lam::Integer, xmin::T, xmax::T)
+   compute_M(n::Int64, lam::Int64, xmin::T, xmax::T)
    Computes n×n M_{λ} matrix for polynomial x over
    the interval [xmin,xmax].
 """
-function compute_M(::Type{T}, n::Integer, lam::Integer, xmin::T, xmax::T) where {T<:AbstractFloat}
+function compute_M(::Type{T}, n::Int64, lam::Int64, xmin::T, xmax::T) where {T<:AbstractFloat}
    M = compute_M(T,n,lam)
 
    a = T(0.5*(xmax-xmin))

@@ -2,7 +2,7 @@
 Ordinary differential equation in radial direction for the
 hyperboloidally compactified Teukolsky equation.
 """
-module RadialODE
+module SpectralRadialODE
 
 export radial_discretized_eqn_c
 
@@ -45,8 +45,8 @@ function radial_discretized_eqn_c(
     S0 = GE.compute_S(T,nr,0);
 
     ### derivative operator that returns C2 ultraspherical
-    D1 = S1*GE.compute_D(T,nr,2,rmin,rmax)
-    D2 = GE.compute_D(T,nr,1,rmin,rmax)
+    D1 = S1*GE.compute_D(T,nr,1,rmin,rmax)
+    D2 = GE.compute_D(T,nr,2,rmin,rmax)
 
     Id = sparse(I, nr, nr)
 
