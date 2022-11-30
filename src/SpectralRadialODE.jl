@@ -39,7 +39,7 @@ function radial_operator(
     rmax::T
 ) where {T<:Real}
     mode_seq = qnm.modes_cache(s=s,l=l,m=m,n=n);
-    om, lambda, C = mode_seq(a=a);
+    om, lambda, C = mode_seq(a=Float64(a));
 
     d = rmin..rmax;
     D1 = Derivative(d);
