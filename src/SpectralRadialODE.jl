@@ -18,11 +18,11 @@ qnm = pyimport("qnm")
     function radial_operator(
         nr::Integer,
         s::Integer,
+        l::Integer,
         m::Integer,
+        n::Integer,
         a::T,
         bhm::T,
-        om::Complex{T},
-        gamma::Complex{T},
         rmin::T,
         rmax::T
     ) where T<:Real
@@ -30,14 +30,17 @@ qnm = pyimport("qnm")
 function radial_operator(
     nr::Integer,
     s::Integer,
+    l::Integer,
     m::Integer,
+    n::Integer,
     a::T,
     bhm::T,
-    om::Complex{T},
-    gamma::Complex{T},
     rmin::T,
     rmax::T
 ) where {T<:Real}
+    mode_seq = qnm.modes_cache(s=s,l=l,m=m,n=n);
+    om, lambda, C = mode_seq(a=a);
+
     d = rmin..rmax;
     D1 = Derivative(d);
     D2 = D1^2;
@@ -60,5 +63,7 @@ function radial_operator(
         x +
         2 * (8 * (bhm^2) * (om^2) + 6 * im * bhm * om - 1) * (a^2) * x^2
     )
-    return (-(x^2 - 2 * bhm * x^3 + (a^2) * x^4) * D2 + A * D1 + (B + gamma))[1:nr,1:nr]
-end;
+    return (-(x^2 - 2 * bhm * x^3 + (a^2) * x^4) * D2 + A * D1 + (B + lambda))[1:nr,1:nr]
+end
+
+end #module
