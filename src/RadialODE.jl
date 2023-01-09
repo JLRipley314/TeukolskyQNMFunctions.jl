@@ -4,7 +4,7 @@ hyperboloidally compactified Teukolsky equation.
 """
 module RadialODE
 
-export eig_vals_vecs_c
+export radial_discretized_eqn_c, eig_vals_vecs_c
 
 include("Chebyshev.jl")
 import .Chebyshev as CH

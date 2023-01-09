@@ -1,12 +1,14 @@
-module QNMFileUtils
+module OvertoneFileUtils
 
 include("../qnmtables/ReadQNM.jl")
 include("../src/Chebyshev.jl")
 include("../src/TeukolskyQNMFunctions.jl")
+include("../src/RadialODE.jl")
+
 import .Chebyshev as CH
 import .TeukolskyQNMFunctions as QNM
 import .ReadQNM
-
+import .RadialODE as RD
 import HDF5
 
 export generate
@@ -22,11 +24,9 @@ function save_to_file!(
     a::T,
     omega::Complex{T},
     lambda::Complex{T},
-    vs::Vector{<:Complex{T}},
     vr::Vector{<:Complex{T}},
     vrc::Vector{<:Complex{T}},
     rs::Vector{<:T},
-    tolerance::T,
 ) where {T<:Real}
     HDF5.h5open("$fname.h5", "cw") do file
         g = HDF5.create_group(file, "[a=$(convert(Float64,a)),l=$(convert(Int64,l))]")
@@ -34,11 +34,9 @@ function save_to_file!(
         g["nl"] = convert(Int64, nl)
         g["omega"] = convert(ComplexF64, omega)
         g["lambda"] = convert(ComplexF64, lambda)
-        g["angular_coef"] = [convert(ComplexF64, v) for v in vs]
         g["radial_func"] = [convert(ComplexF64, v) for v in vr]
         g["radial_coef"] = [convert(ComplexF64, v) for v in vrc]
         g["rvals"] = [convert(Float64, v) for v in rs]
-        g["tolerance"] = convert(Float64, tolerance)
     end
     return nothing
 end
@@ -73,24 +71,16 @@ function generate_data(
             println("nr=$nrtmp\tnl=$nltmp\ta=$a")
             om, la = ReadQNM.qnm(n, s, m, l, a)
            
-            omega, lambda, vs, vr, rs = QNM.compute_om(
+            lambda, vr, rs = RD.eig_vals_vecs_c(
                 nrtmp,
-                nltmp,
                 s,
-                l,
                 m,
                 a,
                 convert(Complex{T},om),
-                tolerance = qnm_tolerance,
-                epsilon = epsilon,
-                gamma = 1.0 - a,
-                verbose = false,
             )
-            println("read in ω=$om")
-            println("read in Λ=$la")
             chebcoef = CH.to_cheb(vr)
-            if ((abs(chebcoef[end]) < coef_tolerance) && (abs(vs[end]) < coef_tolerance))
-                println("compute Λ=$lambda")
+            if ((abs(chebcoef[end]) < coef_tolerance))
+                println("ω=$om, Λ=$lambda")
                 save_to_file!(
                     fname,
                     nrtmp,
@@ -100,27 +90,16 @@ function generate_data(
                     l,
                     m,
                     a,
-                    omega,
+                    om,
                     lambda,
-                    vs,
                     vr,
                     chebcoef,
                     rs,
-                    coef_tolerance,
                 )
                 break
             end
             if (abs(chebcoef[end]) > coef_tolerance)
-                println("-------------------------------")
-                println("not enough tolerance, adding nr")
-                println("-------------------------------")
                 nrtmp += Int64(ceil(nrtmp / 2))
-            end
-            if (abs(vs[end]) > coef_tolerance)
-                println("-------------------------------")
-                println("not enough tolerance, adding nl")
-                println("-------------------------------")
-                nltmp += Int64(ceil(nltmp / 2))
             end
         end
     end
@@ -144,7 +123,7 @@ function generate(
     try
         println("s=$s,m=$m,n=$n,l=$l")
         generate_data(
-            "$(pwd())/qnmfiles/$(prename)s$(s)_m$(m)_n$(n)",
+            "$(pwd())/qnmfiles/$(prename)s$(s)_m$(m)_n$(n)_nr$(nr)",
             nr,
             nl,
             s,
