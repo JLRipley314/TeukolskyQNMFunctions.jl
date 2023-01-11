@@ -99,8 +99,8 @@ function radial_discretized_eqn_a(
     rmax::T,
 ) where {T<:Real}
     d = rmin .. rmax
-    D1 = Derivative(d)
-    D2 = D1^2
+    D1 = Derivative(d,1)
+    D2 = Derivative(d,2) 
     x = Fun(identity, d)
 
     A = (

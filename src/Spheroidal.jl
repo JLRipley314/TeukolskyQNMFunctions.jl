@@ -130,8 +130,8 @@ end
 Compute the matrix for computing spheroidal-spherical mixing and seperation coefficients.
 """
 function compute_M_matrix(nl::Integer, s::Integer, m::Integer, c::Complex)
-    Y1 = Matrix{typeof(c)}(mat_Y(nl + 2, s, m)) # look at larger to capture last term in matrix mult
-    # at higher l
+    Y1 = Matrix{typeof(c)}(mat_Y(nl + 2, s, m)) 
+    # look at larger matrix to capture last term in matrix mult at higher l
     Y2 = Y1 * Y1
     Y1 = Y1[1:nl, 1:nl]
     Y2 = Y2[1:nl, 1:nl]
