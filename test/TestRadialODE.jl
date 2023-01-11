@@ -39,11 +39,11 @@ function compare_to_qnm(
    for a in avals
       om, la = qnm(n,s,m,l,a)
 
-      ls_c, vs_c = RO.eig_vals_vecs_c(nr, s, m, a, om)
+      ls, vs = RO.eig_vals_vecs(nr, s, m, a, om)
 
       #println("testing: a=$a, ω=$om\nΛ=$la, Cheb Λ=$(ls_c[1])")
 
-      @test abs(ls_c - la)/max(1,abs(la))<tolerance
+      @test abs(ls - la)/max(1,abs(la))<tolerance
    end
 end
 

@@ -67,7 +67,7 @@ end
 
 Compute the matrix for y in spectral space.
 """
-function mat_Y(nl::T, s::T, m::T) where T<:Integer
+function mat_Y(nl::T, s::T, m::T) where {T<:Integer}
 
     I = Vector{T}(undef, 0)
     J = Vector{T}(undef, 0)
@@ -105,8 +105,8 @@ end
 
 Compute the matrix for spherical laplacian (s=0) in spectral space.
 """
-function mat_L(nl::T, s::T, m::T) where T<:Integer
-    
+function mat_L(nl::T, s::T, m::T) where {T<:Integer}
+
     I = Vector{T}(undef, 0)
     J = Vector{T}(undef, 0)
     V = Vector{T}(undef, 0)
@@ -129,12 +129,7 @@ end
 
 Compute the matrix for computing spheroidal-spherical mixing and seperation coefficients.
 """
-function compute_M_matrix(
-    nl::Integer,
-    s::Integer,
-    m::Integer,
-    c::Complex
-)
+function compute_M_matrix(nl::Integer, s::Integer, m::Integer, c::Complex)
     Y1 = Matrix{typeof(c)}(mat_Y(nl + 2, s, m)) # look at larger to capture last term in matrix mult
     # at higher l
     Y2 = Y1 * Y1
@@ -154,13 +149,7 @@ Returns eigenvalues λs (smallest to largest), and eigenvectors as
 an array (access nth eigenvector through v[:,n]); i.e. returns
 (λs, vs)
 """
-function eig_vals_vecs(
-    nl::Integer,
-    neig::Integer,
-    s::Integer,
-    m::Integer,
-    c::Complex
-)
+function eig_vals_vecs(nl::Integer, neig::Integer, s::Integer, m::Integer, c::Complex)
 
     Mat = compute_M_matrix(nl, s, m, c)
 

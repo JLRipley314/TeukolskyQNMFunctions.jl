@@ -4,7 +4,7 @@ hyperboloidally compactified Teukolsky equation.
 """
 module RadialODE
 
-export eig_vals_vecs_c
+export eig_vals_vecs
 
 include("Chebyshev.jl")
 import .Chebyshev as CH
@@ -15,7 +15,7 @@ using GenericSchur
 using SparseArrays
 
 """
-    function radial_discretized_eqn_c(
+    function radial_discretized_eqn(
         nr::Integer,
         s::Integer,
         m::Integer,
@@ -26,7 +26,7 @@ using SparseArrays
         rmax::T
     ) where T<:Real
 """
-function radial_discretized_eqn_c(
+function radial_discretized_eqn(
     nr::Integer,
     s::Integer,
     m::Integer,
@@ -69,7 +69,7 @@ function radial_discretized_eqn_c(
 end
 
 """
-    eig_vals_vecs_c(
+    eig_vals_vecs(
             nr::Integer,
             s::Integer,
             m::Integer,
@@ -81,7 +81,7 @@ Compute eigenvectors and eigenvalues for the radial equation
 using a pseudospectral Chebyshev polynomial method.
 The black hole mass is always one.
 """
-function eig_vals_vecs_c(
+function eig_vals_vecs(
     nr::Integer,
     s::Integer,
     m::Integer,
@@ -95,7 +95,7 @@ function eig_vals_vecs_c(
     rmin = TR(0) ## location of future null infinity (1/r = ∞)
     rmax = abs(a) > 0 ? (bhm / (a^2)) * (1 - sqrt(1 - ((a / bhm)^2))) : 0.5 / bhm
 
-    Mat = radial_discretized_eqn_c(nr, s, m, a, bhm, om, rmin, rmax)
+    Mat = radial_discretized_eqn(nr, s, m, a, bhm, om, rmin, rmax)
     t = eigen(Matrix(Mat), permute = true, scale = true, sortby = abs)
 
     return -t.values[1], t.vectors[:, 1], CH.cheb_pts(rmin, rmax, nr)

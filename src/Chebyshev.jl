@@ -12,7 +12,7 @@ using SparseArrays
 
 Computes Generates nx Chebyshev points in [-1,1]
 """
-function cheb_pts(::Type{T}, nx::Integer) where T<:AbstractFloat
+function cheb_pts(::Type{T}, nx::Integer) where {T<:AbstractFloat}
     return [cos(pi * i / (nx - T(1))) for i = 0:(nx-1)]
 end
 
@@ -109,7 +109,7 @@ end
 
 Convert to Chebyshev space. We assume we are working with Chebyshev-Gauss-Lobatto points.
 """
-function to_cheb(f::Vector{T}) where T<:Number
+function to_cheb(f::Vector{T}) where {T<:Number}
 
     N = length(f) - 1
     c = zeros(T, N + 1)
@@ -134,7 +134,7 @@ end
 
 Convert to Real space. We assume we are working with Chebyshev-Gauss-Lobatto points.
 """
-function to_real(c::Vector{T}) where T<:Number
+function to_real(c::Vector{T}) where {T<:Number}
 
     N = length(c) - 1
     f = zeros(T, N + 1)

@@ -16,15 +16,15 @@ import .Spheroidal as SH
 import .RadialODE as RD
 
 """
-    F(
-            nr::Integer,
-            nl::Integer,
-            s::Integer,
-            l::Integer,
-            m::Integer,
-            a::T,
-            om::Complex{T}
-        ) where T<:Real
+    function F(
+        nr::Integer,
+        nl::Integer,
+        s::Integer,
+        l::Integer,
+        m::Integer,
+        a::T,
+        om::Complex{T},
+    ) where {T<:Real}
 
 Compute the absolute difference of Lambda seperation constant for radial and angular ODEs.
 """
@@ -42,7 +42,7 @@ function F(
     neig = l - lmin + 1 # number of eigenvalues
 
     la_s, _ = SH.eig_vals_vecs(nl, neig, s, m, a * om)
-    la_r, _, _ = RD.eig_vals_vecs_c(nr, s, m, a, om)
+    la_r, _, _ = RD.eig_vals_vecs(nr, s, m, a, om)
 
     ## The Lambdas are ordered in size of smallest magnitude
     ## to largest magnitude, we ASSUME this is the same as the
@@ -132,7 +132,7 @@ function compute_om(
     neig = l - lmin + 1 # number of eigenvalues
 
     la_s, v_s = SH.eig_vals_vecs(nl, neig, s, m, a * om_np1)
-    la_r, v_r, rvals = RD.eig_vals_vecs_c(nr, s, m, a, om_np1)
+    la_r, v_r, rvals = RD.eig_vals_vecs(nr, s, m, a, om_np1)
 
     return om_np1, la_r, v_s[:, l-lmin+1], v_r, rvals
 end

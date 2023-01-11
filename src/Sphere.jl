@@ -5,8 +5,7 @@ module Sphere
 
 setprecision(2048) # BigFloat precision in bits
 
-import QuadGK 
-import Jacobi: jacobi
+import QuadGK
 
 export Y_vals,
     cos_vals,
@@ -18,6 +17,38 @@ export Y_vals,
 
 function cBF(v::Number)
     return convert(BigFloat, v)
+end
+
+"""
+    jacobi(x::T, n::Integer, a::T, b::T)::T where {T<:Number}
+
+    The Jacobi polynomial.
+"""
+function jacobi(x::T, n::Integer, a::T, b::T)::T where {T<:Number}
+    ox = one(x)
+    zx = zero(x)
+    if n == 0
+        return ox
+    elseif n == 1
+        return (ox / 2) * (a - b + (a + b + 2) * x)
+    end
+
+    p0 = ox
+    p1 = (ox / 2) * (a - b + (a + b + 2) * x)
+    p2 = zx
+
+    for i = 1:(n-1)
+        a1 = 2 * (i + 1) * (i + a + b + 1) * (2 * i + a + b)
+        a2 = (2 * i + a + b + 1) * (a * a - b * b)
+        a3 = (2 * i + a + b) * (2 * i + a + b + 1) * (2 * i + a + b + 2)
+        a4 = 2 * (i + a) * (i + b) * (2 * i + a + b + 2)
+        p2 = (ox / a1) * ((a2 + a3 * x) * p1 - a4 * p0)
+
+        p0 = p1
+        p1 = p2
+    end
+
+    return p2
 end
 
 """
@@ -48,7 +79,7 @@ return: ∫ dy v1 conj(v2)
 function inner_product(v1::Vector{T}, v2::Vector{T})::T where {T<:Number}
     ny = size(v1)[1]
 
-    _, weights = QuadGK.gauss(typeof(real(v1[1])),ny)
+    _, weights = QuadGK.gauss(typeof(real(v1[1])), ny)
 
     s = 0.0
     for j = 1:ny
@@ -63,7 +94,7 @@ end
 
 Compute the Gauss-Legendre points (y) over the interval [-1,1].
 """
-function Y_vals(ny::Integer, T::Type{<:Real}=Float64)
+function Y_vals(ny::Integer, T::Type{<:Real} = Float64)
 
     roots, _ = QuadGK.gauss(T, ny)
 
@@ -75,11 +106,11 @@ end
 
 Compute cos(y) at Gauss-Legendre points over interval [-1,1].
 """
-function cos_vals(ny::Integer, T::Type{<:Real}=Float64)
+function cos_vals(ny::Integer, T::Type{<:Real} = Float64)
 
     yv = Y_vals(ny, T)
 
-    return -yv 
+    return -yv
 end
 
 """
@@ -87,7 +118,7 @@ end
 
 Compute sin(y) at Gauss-Legendre points over interval [-1,1].
 """
-function sin_vals(ny::Integer, T::Type{<:Real}=Float64)
+function sin_vals(ny::Integer, T::Type{<:Real} = Float64)
 
     yv = Y_vals(ny, T)
 
@@ -119,10 +150,8 @@ function swal(spin::Integer, m_ang::Integer, l_ang::Integer, y::Real)
     end
 
     norm = sqrt(
-        (2 * n + al + be + 1) *
-        (2^(-al - be - 1.0)) *
-        factorial(cBF(n + al + be)) / factorial(cBF(n + al)) *
-        factorial(cBF(n)) / factorial(cBF(n + be)),
+        (2 * n + al + be + 1) * (2^(-al - be - 1.0)) * factorial(cBF(n + al + be)) /
+        factorial(cBF(n + al)) * factorial(cBF(n)) / factorial(cBF(n + be)),
     )
     norm *= (-1)^(max(m_ang, -spin))
 
@@ -131,7 +160,7 @@ function swal(spin::Integer, m_ang::Integer, l_ang::Integer, y::Real)
         norm *
         ((1 - y)^(al / 2)) *
         ((1 + y)^(be / 2)) *
-        jacobi(y, cBF(n), cBF(al), cBF(be)),
+        jacobi(cBF(y), Integer(n), cBF(al), cBF(be)),
     )
 end
 
@@ -141,9 +170,9 @@ end
 Compute the matrix swal^s_{lm}(y) at Gauss-Legendre points,
 over a grid of l values (and fixed m).
 """
-function swal_vals(ny::Integer, spin::Integer, m_ang::Integer, T::Type{<:Real}=Float64)
+function swal_vals(ny::Integer, spin::Integer, m_ang::Integer, T::Type{<:Real} = Float64)
 
-    yv = Y_vals(ny, T) 
+    yv = Y_vals(ny, T)
 
     nl = num_l(ny)
 
@@ -153,7 +182,7 @@ function swal_vals(ny::Integer, spin::Integer, m_ang::Integer, T::Type{<:Real}=F
 
     for k = 1:nl
         l_ang = k - 1 + lmin
-        for (j,y) in enumerate(yv)
+        for (j, y) in enumerate(yv)
             vals[j, k] = swal(spin, m_ang, l_ang, y)
         end
     end
@@ -167,7 +196,12 @@ Compute the matrix to compute spin-weighted spherical harmonic laplacian.
 To compute the spherical laplacian use the function 
 set_lap!(v_lap,v,lap_matrix)
 """
-function swal_laplacian_matrix(ny::Integer, spin::Integer, m_ang::Integer, T::Type{<:Real}=Float64)
+function swal_laplacian_matrix(
+    ny::Integer,
+    spin::Integer,
+    m_ang::Integer,
+    T::Type{<:Real} = Float64,
+)
 
     rv, wv = QuadGK.gauss(T, ny)
 
@@ -199,7 +233,12 @@ end
 Compute the matrix to compute low pass filter.
 Multiply the matrix on the left: v[i]*M[i,j] -> v[j]
 """
-function swal_filter_matrix(ny::Integer, spin::Integer, m_ang::Integer, T::Type{<:Real}=Float64)
+function swal_filter_matrix(
+    ny::Integer,
+    spin::Integer,
+    m_ang::Integer,
+    T::Type{<:Real} = Float64,
+)
 
     rv, wv = QuadGK.gauss(T, ny)
 
