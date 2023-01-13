@@ -86,10 +86,11 @@ function generate_data(
                 gamma = 1.0 - a,
                 verbose = false,
             )
-            println("here $om $la")
+            println("read in ω=$om")
+            println("read in Λ=$la")
             chebcoef = CH.to_cheb(vr)
             if ((abs(chebcoef[end]) < coef_tolerance) && (abs(vs[end]) < coef_tolerance))
-                println("ω=$omega, Λ=$lambda")
+                println("compute Λ=$lambda")
                 save_to_file!(
                     fname,
                     nrtmp,
@@ -110,9 +111,15 @@ function generate_data(
                 break
             end
             if (abs(chebcoef[end]) > coef_tolerance)
+                println("-------------------------------")
+                println("not enough tolerance, adding nr")
+                println("-------------------------------")
                 nrtmp += Int64(ceil(nrtmp / 2))
             end
             if (abs(vs[end]) > coef_tolerance)
+                println("-------------------------------")
+                println("not enough tolerance, adding nl")
+                println("-------------------------------")
                 nltmp += Int64(ceil(nltmp / 2))
             end
         end

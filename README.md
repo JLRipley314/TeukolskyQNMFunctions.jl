@@ -22,7 +22,8 @@ The angular spectral method was originally introduced by
 The note [arXiv:2202.03837](https://arxiv.org/abs/2202.03837) 
 explains the main ideas that went into this code,
 and derives the relevant equations of motion.
-See also the docstrings to the functions in the source code.
+
+See also the `examples` directory.
 
 # Warning!
 
@@ -34,10 +35,10 @@ If you just want to compute a quasinormal mode, I suggest using that code,
 or looking at the publicly available qnm tables, e.g. 
 Emanuele Berti's [tables of qnm](https://pages.jh.edu/eberti2/ringdown/).
 
-# To Do
-
-* Add spectral (~Leaver) solver for radial equation, which will likely be
-  more stable than the Chebyshev pseudospectral solver. 
+There have been some issues computing higher overtones as well if many
+radial resolution points are used (likely because Chebyshev
+pseudospectral operators are not very well conditioned), so always
+make sure to check the computed quasinormal mode with other methods.
 
 # How to cite
 
