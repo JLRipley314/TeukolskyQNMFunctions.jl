@@ -25,6 +25,33 @@ tomyI(x) = convert(Int64,x)
 tomyF(x) = convert(Float64,x)
 tomyC(x) = convert(Complex{Float64},x)
 
+##--------------------------------------------------------------
+## Testing Radial ODE QNM 
+##--------------------------------------------------------------
+nr = 80 
+
+for n=[0]
+   for s=-2:0
+      mvals = [abs(s)]
+      for m=[-2,0,1]
+         lmin = compute_l_min(s,m)
+         lvals = [lmin]
+         if n==0
+            mvals = lmin:(lmin+1) 
+         end  
+         for l=lvals
+            TestRadialODE.compare_to_qnm(
+                  tomyI(nr),
+                  tomyI(s),
+                  tomyI(n),
+                  tomyI(l),
+                  tomyI(m),
+                  [tomyF(a) for a in avals]
+               )
+         end
+      end
+   end
+end
 ###--------------------------------------------------------------
 ## Test convergence of Chebyshev derivatives 
 ##--------------------------------------------------------------
@@ -140,33 +167,6 @@ for n=[0,1]
                            tomyI(l),
                            tomyI(m),
                            [tomyF(a) for a in avals]
-               )
-         end
-      end
-   end
-end
-##--------------------------------------------------------------
-## Testing Radial ODE QNM 
-##--------------------------------------------------------------
-nr = 80 
-
-for n=[0]
-   for s=-2:0
-      mvals = [abs(s)]
-      for m=[-2,0,1]
-         lmin = compute_l_min(s,m)
-         lvals = [lmin]
-         if n==0
-            mvals = lmin:(lmin+1) 
-         end  
-         for l=lvals
-            TestRadialODE.compare_to_qnm(
-                  tomyI(nr),
-                  tomyI(s),
-                  tomyI(n),
-                  tomyI(l),
-                  tomyI(m),
-                  [tomyF(a) for a in avals]
                )
          end
       end

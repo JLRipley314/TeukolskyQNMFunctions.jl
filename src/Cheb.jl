@@ -1,7 +1,7 @@
 """
 Methods for position space Chebyshev methods. 
 """
-module Chebyshev
+module Cheb
 
 export chep_pts, mat_X, mat_D1, to_cheb, to_real
 

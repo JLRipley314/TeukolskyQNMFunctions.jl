@@ -3,14 +3,14 @@ module TestChebyshev
 export test_convergence,
     test_X_matrices, test_to_cheb, test_to_cheb_to_real
 
-include("../src/Chebyshev.jl")
+include("../src/Cheb.jl")
 
 import Test: @test
 
 const tolerance = 1e-8 ## tolerance we compare to
 
 ##============================================================
-import .Chebyshev as CH
+import .Cheb as CH
 
 """
 One norm 

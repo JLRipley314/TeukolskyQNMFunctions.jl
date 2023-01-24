@@ -6,8 +6,8 @@ module RadialODE
 
 export eig_vals_vecs, Basis
 
-include("Chebyshev.jl")
-import .Chebyshev as CH
+include("Cheb.jl")
+import .Cheb as CH
 
 using LinearAlgebra
 using GenericSchur
@@ -66,7 +66,7 @@ function radial_discretized_eqn_c(
         X1 +
         2 * (8 * (bhm^2) * (om^2) + 6 * im * bhm * om - 1) * (a^2) * X2
     )
-    
+
     return (-(X2 - 2 * bhm * X3 + (a^2) * X4) * D2 + A * D1 + B)
 end
 
@@ -99,8 +99,8 @@ function radial_discretized_eqn_a(
     rmax::T,
 ) where {T<:Real}
     d = rmin .. rmax
-    D1 = Derivative(d,1)
-    D2 = Derivative(d,2) 
+    D1 = Derivative(d, 1)
+    D2 = D1^2
     x = Fun(identity, d)
 
     A = (
@@ -120,6 +120,11 @@ function radial_discretized_eqn_a(
         x +
         2 * (8 * (bhm^2) * (om^2) + 6 * im * bhm * om - 1) * (a^2) * x^2
     )
+
+    step1 = Conversion(Chebyshev(d), Ultraspherical(2, d))
+    step2 = Conversion(Chebyshev(d), Ultraspherical(2, d))[1:nr,1:nr]
+    step3 = Matrix(Conversion(Chebyshev(d), Ultraspherical(2, d))[1:nr,1:nr])
+    step4 = inv(Matrix(Conversion(Chebyshev(d), Ultraspherical(2, d))[1:nr,1:nr]))
 
     pre = inv(Matrix(Conversion(Chebyshev(d), Ultraspherical(2, d))[1:nr, 1:nr])) # conversion matrix
 
@@ -152,7 +157,7 @@ function eig_vals_vecs(
     rmin = T(0) ## location of future null infinity (1/r = ∞)
     rmax = abs(a) > 0 ? (bhm / (a^2)) * (1 - sqrt(1 - ((a / bhm)^2))) : 0.5 / bhm
 
-    Mat = radial_discretized_eqn_c(nr, s, m, a, bhm, om, rmin, rmax)
+    Mat = radial_discretized_eqn_a(nr, s, m, a, bhm, om, rmin, rmax)
     t = eigen(Matrix(Mat), permute = true, scale = true, sortby = abs)
 
     return -t.values[1], t.vectors[:, 1], CH.cheb_pts(rmin, rmax, nr)

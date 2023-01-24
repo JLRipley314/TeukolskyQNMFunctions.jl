@@ -4,8 +4,8 @@ export interval_laplacian_ch, interval_laplacian_fd, interval_laplacian_chs
 
 const tolerance = 1e-6 ## tolerance we compare to
 
-include("../src/Chebyshev.jl")
-import .Chebyshev as CH
+include("../src/Cheb.jl")
+import .Cheb as CH
 
 using LinearAlgebra: I, eigvals
 using SparseArrays

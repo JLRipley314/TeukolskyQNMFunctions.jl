@@ -1,9 +1,9 @@
 module QNMFileUtils
 
 include("../qnmtables/ReadQNM.jl")
-include("../src/Chebyshev.jl")
+include("../src/Cheb.jl")
 include("../src/TeukolskyQNMFunctions.jl")
-import .Chebyshev as CH
+import .Cheb as CH
 import .TeukolskyQNMFunctions as QNM
 import .ReadQNM
 
