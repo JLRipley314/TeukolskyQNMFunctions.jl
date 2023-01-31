@@ -23,7 +23,7 @@ function save_to_file!(
     omega::Complex{T},
     lambda::Complex{T},
     vs::Vector{<:Complex{T}},
-    vr::Vector{<:Complex{T}},
+    vr,
     vrc::Vector{<:Complex{T}},
     rs::Vector{<:T},
     tolerance::T,
@@ -88,7 +88,8 @@ function generate_data(
             )
             println("read in ω=$om")
             println("read in Λ=$la")
-            chebcoef = CH.to_cheb(vr)
+            
+            println("cheb coef tolerance=$(abs(vr[end]))\tswal coef tolerance=$(abs(vs[end]))")
             if ((abs(chebcoef[end]) < coef_tolerance) && (abs(vs[end]) < coef_tolerance))
                 println("compute Λ=$lambda")
                 save_to_file!(
