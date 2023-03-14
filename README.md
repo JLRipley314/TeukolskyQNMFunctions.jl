@@ -11,11 +11,27 @@ using a horizon penetrating, hyperboloidally compactified coordinate system.
 The main advantage of using these coordinates is that the quasinormal
 wavefunctions are finite valued from the black hole to future null infinity.
 
-Currently, this code uses a Chebyshev pseudospectral method to compute
+# Discretization scheme overview
+
+The original version of this code used a Chebyshev pseudospectral method to compute
 the radial part of the eigenfunctions, 
 and a spectral method to compute the angular part of the eigenfunctions
 The angular spectral method was originally introduced by 
 [Cook and Zalutskiy](https://arxiv.org/abs/1410.7698)).
+
+The current version of the code makes use of a fully spectral method to
+discretize in the radial direction.
+
+This method was originally described in (see also the bibtex entry at the end) 
+```
+Olver, Sheehan, and Alex Townsend. 
+"A fast and well-conditioned spectral method." 
+siam REVIEW 55.3 (2013): 462-489.
+```
+
+We make use of the 
+[ApproxFun.jl](https://github.com/JuliaApproximation/ApproxFun.jl) package to
+perform the new, spectral discretization.   
 
 # Documentation
 
@@ -35,10 +51,17 @@ If you just want to compute a quasinormal mode, I suggest using that code,
 or looking at the publicly available qnm tables, e.g. 
 Emanuele Berti's [tables of qnm](https://pages.jh.edu/eberti2/ringdown/).
 
-There have been some issues computing higher overtones as well if many
-radial resolution points are used (likely because Chebyshev
-pseudospectral operators are not very well conditioned), so always
-make sure to check the computed quasinormal mode with other methods.
+# Computing overtones
+
+The original version of this code (which made use of a pseudo-spectral discretization
+in the radial direction) had some issues computing higher overtones,
+since radial points were needed to resolve those modes. 
+This likely because Chebyshev
+pseudospectral operators are not very well conditioned.
+
+The current version of the code makes use of a fully spectral method via
+the ApproxFun package (see above), and can now resolve higher overtones.
+See `examples/example_compute_qnm.jl` for example overtone calculations. 
 
 # How to cite
 
@@ -58,5 +81,24 @@ which describes the ideas that went into this code, please cite
     number = "14",
     pages = "145009",
     year = "2022"
+}
+```
+
+If you use the newest version of this code that makes use of the ApproxFun.jl
+package, I suggest you cite that package as well, along with 
+```
+@article{olver2013fast,
+  author="Olver, Sheehan and Townsend, Alex",
+  title="{A fast and well-conditioned spectral method}",
+  eprint = "1202.1347",
+  archivePrefix = "arXiv",
+  primaryClass = "math.NA",
+  doi= "https://doi.org/10.1137/120865458", 
+  journal="siam REVIEW",
+  volume="55",
+  number="3",
+  pages="462--489",
+  year="2013",
+  publisher="SIAM"
 }
 ```

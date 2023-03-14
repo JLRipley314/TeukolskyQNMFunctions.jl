@@ -28,7 +28,7 @@ QF.generate("", nr, nl, s, m, l, n, avals, qnm_tolerance, coef_tolerance, epsilo
 
 nr = 32 
 nl = 8 
-s = -2
+s = 2
 m = 3
 l = 3
 avals = [T(0.0), T(0.7), T(0.99)]
