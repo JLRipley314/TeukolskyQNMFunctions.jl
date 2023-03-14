@@ -21,7 +21,6 @@ The angular spectral method was originally introduced by
 
 The current version of the code makes use of a fully spectral method to
 discretize in the radial direction.
-
 This method was originally described in (see also the bibtex entry at the end) 
 ```
 Olver, Sheehan, and Alex Townsend. 
