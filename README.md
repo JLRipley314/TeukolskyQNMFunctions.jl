@@ -101,3 +101,10 @@ package, I suggest you cite that package as well, along with
   publisher="SIAM"
 }
 ```
+
+# Contribution/Contact 
+
+If you would like to add a feature, fix a bug, etc, 
+you can open a pull request, or email me (Justin) at
+
+ripley [at] illinois [dot] edu
