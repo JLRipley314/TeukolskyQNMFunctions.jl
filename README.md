@@ -40,6 +40,11 @@ and derives the relevant equations of motion.
 
 See also the `examples` directory.
 
+# Conventions 
+
+* The black hole mass is set to 1 in the code, so the black hole
+spin parameter can be see as the dimensionless spin. 
+
 # Warning!
 
 This code does *not* compute quasinormal modes nearly as quickly 
