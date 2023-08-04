@@ -1,5 +1,6 @@
 # TeukolskyQNMFunctions.jl
 
+[![DOI](https://zenodo.org/badge/455120587.svg)](https://zenodo.org/badge/latestdoi/455120587)
 <!--- [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://JLRipley314.github.io/TeukolskyQNMFunctions.jl/stable) -->
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://JLRipley314.github.io/TeukolskyQNMFunctions.jl/dev)
 [![Build Status](https://github.com/JLRipley314/TeukolskyQNMFunctions.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/JLRipley314/TeukolskyQNMFunctions.jl/actions/workflows/CI.yml?query=branch%3Amain)
@@ -69,9 +70,9 @@ See `examples/example_compute_qnm.jl` for example overtone calculations.
 
 # How to cite
 
-If you end up using this code in a publication, or some of the ideas in
-[arXiv:2202.03837](https://arxiv.org/abs/2202.03837), 
-which describes the ideas that went into this code, please cite
+There is a Zenodo link at the top of this README, if you would like to cite
+the code directly.
+If you end up using this code in a publication, please also cite
 ```
 @article{Ripley:2022ypi,
     author = "Ripley, Justin L.",
@@ -88,7 +89,7 @@ which describes the ideas that went into this code, please cite
 }
 ```
 
-If you use the newest version of this code that makes use of the ApproxFun.jl
+If you use the latest version of this code that makes use of the ApproxFun.jl
 package, I suggest you cite that package as well, along with 
 ```
 @article{olver2013fast,
