@@ -4,6 +4,9 @@ using SpecialFunctions
 using LinearAlgebra
 using SparseArrays
 
+using PyCall
+@pyimport qnm
+
 include("../src/Chebyshev.jl")
 import .Chebyshev as CH
 
@@ -16,13 +19,14 @@ using GenericLinearAlgebra # for svd of bigfloat matrix
 # input params
 
 nr = 160;
+nr_interp = 300;
 s = -2;
 l = 2;
-m = 2;
-nmin = 8;
-nmax = 12;
+m = -2;
+nmin = 0;
+nmax = 7;
 T=BigFloat
-a = T(0.0);
+a = T(0);
 bhm = T(1);
 
 rmin = T(0); ## location of future null infinity (1/r = ∞)
@@ -35,19 +39,23 @@ function save_to_file!(
     l::Integer,
     m::Integer,
     a::T,
-    #omega::ComplexF64,
-    #lambda::ComplexF64,
+    omega::ComplexF64,
+    lambda::ComplexF64,
+    C::Vector{ComplexF64},
+    radial_coef::Vector{<:Complex{T}},
     vr::Vector{<:Complex{T}},
     rs::Vector{<:T},
     amp::Vector{<:T},
     damp::Vector{<:T},
 ) where {T<:Real}
-    fname = "$(pwd())/qnmfiles/$(prename)a$(a)_l$(l)_m$(m)_n$(n)"
+    fname = "$(pwd())/qnmfiles/$(prename)a$(Float32(a))_l$(l)_m$(m)"
     HDF5.h5open("$fname.h5", "cw") do file
-        g = HDF5.create_group(file, "[a=$(convert(Float64,a)),l=$(convert(Int64,l))]")
+        g = HDF5.create_group(file, "[n=$(convert(Int32,n))]")
         g["nr"] = convert(Int64, length(rs))
-        # g["omega"] = convert(ComplexF64, omega)
-        # g["lambda"] = convert(ComplexF64, lambda)
+        g["omega"] = [convert(ComplexF64, omega)]
+        g["lambda"] = [convert(ComplexF64, lambda)]
+        g["angular_coef"] = C
+        g["radial_coef"] = [convert(ComplexF64, v) for v in radial_coef]
         g["radial_func"] = [convert(ComplexF64, v) for v in vr]
         g["rvals"] = [convert(Float64, v) for v in rs]
         g["amp"] = [convert(Float64, v) for v in amp]
@@ -56,14 +64,18 @@ function save_to_file!(
     return nothing
 end;
 
-for n=0:12
+for n=nmin:nmax
+    mode_seq = qnm.modes_cache(s=s,l=l,m=m,n=n);
+    omega, lambda, C = mode_seq(a=Float64(a));
     M = RODE.radial_operator(nr,s,l,m,n,a,bhm,rmin,rmax);
+    rs = CH.cheb_pts(rmin,rmax,nr_interp);
+    radial_coef = nullspace(Matrix(M),rtol=1e-10)[:,end];
+    null_interp = zeros(Complex{T},nr_interp);
+    null_interp[1:nr] = radial_coef;
+    vect = CH.to_real(null_interp);
+    amp = [abs(v/vect[end]) for v in vect];
     println(n)
-    rs = CH.cheb_pts(rmin,rmax,nr);
-    null = nullspace(Matrix(M),rtol=1e-10);
-    vect = CH.to_real(null[:,end]);
-    amp = [abs(v/vect[1]) for v in vect];
-    D = CH.mat_D1(rmin,rmax,nr);
+    D = CH.mat_D1(rmin,rmax,nr_interp);
     damp = D*amp;
-    save_to_file!("",n,l,m,a,vect,rs,amp,damp)
-end
+    save_to_file!("",n,l,m,a,omega,lambda,C,radial_coef,vect,rs,amp,damp)
+end;
