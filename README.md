@@ -56,6 +56,10 @@ If you just want to compute a quasinormal mode, I suggest using that code,
 or looking at the publicly available qnm tables, e.g. 
 Emanuele Berti's [tables of qnm](https://pages.jh.edu/eberti2/ringdown/).
 
+# Initial data
+
+This code can be used to generate pure QNM initial data for the [TeukEvolution.jl](https://github.com/JLRipley314/TeukEvolution.jl) code. 
+
 # Computing overtones
 
 The original version of this code (which made use of a pseudo-spectral discretization
